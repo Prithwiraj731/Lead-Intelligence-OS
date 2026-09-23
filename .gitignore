@@ -33,3 +33,7 @@ packages/database/prisma/migrations/
 # Scratch & Logs
 scratch/
 *.log
+
+# User Data & Spreadsheets
+*.xlsx
+Punjab_Cafe_Leads.xlsx
