@@ -204,7 +204,10 @@ export default function ReviewQueuePage() {
                     <div className="sm:text-right font-mono">
                       <span className="text-[10px] text-slate-400 block">EST. BUDGET</span>
                       <span className="text-cyan-400 font-bold text-xs">
-                        AED {Number(msg.opportunity.estimatedBudgetMin).toLocaleString()} – AED {Number(msg.opportunity.estimatedBudgetMax).toLocaleString()}
+                        {(msg.opportunity.currency === "INR" ? "₹" : (msg.opportunity.currency === "USD" ? "$" : (msg.opportunity.currency === "GBP" ? "£" : (msg.opportunity.currency === "EUR" ? "€" : `${msg.opportunity.currency || "AED"} `))))}
+                        {Number(msg.opportunity.estimatedBudgetMin).toLocaleString()} –{" "}
+                        {(msg.opportunity.currency === "INR" ? "₹" : (msg.opportunity.currency === "USD" ? "$" : (msg.opportunity.currency === "GBP" ? "£" : (msg.opportunity.currency === "EUR" ? "€" : `${msg.opportunity.currency || "AED"} `))))}
+                        {Number(msg.opportunity.estimatedBudgetMax).toLocaleString()}
                       </span>
                     </div>
                   </div>

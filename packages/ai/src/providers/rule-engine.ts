@@ -442,6 +442,42 @@ export class RuleEngineAiProvider implements AiProvider {
       recommendedChannel = "NO_CHANNEL";
     }
 
+    // Dynamic Currency & Regional Budget Calibration
+    const isIndia =
+      (input.country && /india/i.test(input.country)) ||
+      (input.location && /(india|punjab|delhi|mumbai|bangalore|bengaluru|chandigarh|ludhiana|jalandhar|amritsar|patiala|batala)/i.test(input.location));
+    const isUS =
+      (input.country && /(usa|united states|\bus\b)/i.test(input.country)) ||
+      (input.location && /(usa|united states|\bus\b)/i.test(input.location));
+    const isUK =
+      (input.country && /(uk|united kingdom|great britain|england|london)/i.test(input.country));
+    const isEurope =
+      (input.country && /(germany|france|netherlands|spain|italy|ireland)/i.test(input.country));
+
+    let currency = "AED";
+    let finalMinBudget = minBudget;
+    let finalMaxBudget = maxBudget;
+
+    if (isIndia) {
+      currency = "INR";
+      finalMinBudget = minBudget; // e.g. 25,000 - 60,000 INR
+      finalMaxBudget = maxBudget;
+    } else if (isUS) {
+      currency = "USD";
+      finalMinBudget = Math.round(minBudget / 10); // e.g. $2,500 - $6,000 USD
+      finalMaxBudget = Math.round(maxBudget / 10);
+    } else if (isUK) {
+      currency = "GBP";
+      finalMinBudget = Math.round(minBudget / 12); // e.g. £2,000 - £5,000 GBP
+      finalMaxBudget = Math.round(maxBudget / 12);
+    } else if (isEurope) {
+      currency = "EUR";
+      finalMinBudget = Math.round(minBudget / 11); // e.g. €2,200 - €5,500 EUR
+      finalMaxBudget = Math.round(maxBudget / 11);
+    } else {
+      currency = "AED";
+    }
+
     return {
       opportunityScore: Math.min(100, Math.max(0, opportunityScore)),
       confidenceScore: Math.min(100, Math.max(0, confidenceScore)),
@@ -459,9 +495,9 @@ export class RuleEngineAiProvider implements AiProvider {
       suggestedOffer,
       expectedBusinessBenefit,
       claimType,
-      estimatedBudgetMin: minBudget,
-      estimatedBudgetMax: maxBudget,
-      currency: "AED",
+      estimatedBudgetMin: finalMinBudget,
+      estimatedBudgetMax: finalMaxBudget,
+      currency,
       pitchAngle,
       evidenceSummary,
     };

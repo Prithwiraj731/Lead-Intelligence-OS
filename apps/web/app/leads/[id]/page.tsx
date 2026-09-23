@@ -429,10 +429,12 @@ export default function LeadDetailPage({
 
             <div className="p-3.5 rounded-xl bg-[#0c0e14]/80 border border-border/80 space-y-1">
               <span className="text-[10px] text-slate-400 font-mono uppercase block">
-                Estimated Project Bracket (AED)
+                Estimated Project Bracket ({topOpportunity.currency || "USD"})
               </span>
               <p className="text-xs font-mono font-bold text-cyan-300">
-                AED {Number(topOpportunity.estimatedBudgetMin).toLocaleString()} – AED{" "}
+                {(topOpportunity.currency === "INR" ? "₹" : (topOpportunity.currency === "USD" ? "$" : (topOpportunity.currency === "GBP" ? "£" : (topOpportunity.currency === "EUR" ? "€" : `${topOpportunity.currency || "AED"} `))))}
+                {Number(topOpportunity.estimatedBudgetMin).toLocaleString()} –{" "}
+                {(topOpportunity.currency === "INR" ? "₹" : (topOpportunity.currency === "USD" ? "$" : (topOpportunity.currency === "GBP" ? "£" : (topOpportunity.currency === "EUR" ? "€" : `${topOpportunity.currency || "AED"} `))))}
                 {Number(topOpportunity.estimatedBudgetMax).toLocaleString()}{" "}
                 <span className="text-[10px] text-slate-500 font-sans font-normal">(Estimated guide)</span>
               </p>

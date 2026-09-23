@@ -39,10 +39,12 @@ export async function POST(
 
     // 2. AI Opportunity & Dual Scoring Engine
     const aiProvider = getAiProvider();
+    const resolvedLocation = [company.city, company.country].filter(Boolean).join(", ") || company.location || company.country || "UAE";
     const analysis = await aiProvider.analyzeCompanyOpportunity({
       companyName: company.name,
       industry: company.industry,
-      location: company.city || company.location || company.country,
+      location: resolvedLocation,
+      country: company.country,
       website: company.domain,
       description: company.description,
       websiteAudit: auditReport,

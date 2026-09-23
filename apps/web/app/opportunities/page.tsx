@@ -110,8 +110,8 @@ export default function OpportunitiesPage() {
 
                 <div className="pt-3 border-t border-border/60 flex items-center justify-between">
                   <span className="text-[11px] font-mono text-slate-400">
-                    Est: AED {Number(opp.estimatedBudgetMin).toLocaleString()} -{" "}
-                    {Number(opp.estimatedBudgetMax).toLocaleString()}
+                    Est: {(opp.currency === "INR" ? "₹" : (opp.currency === "USD" ? "$" : (opp.currency === "GBP" ? "£" : (opp.currency === "EUR" ? "€" : `${opp.currency || "AED"} `))))}{Number(opp.estimatedBudgetMin).toLocaleString()} -{" "}
+                    {(opp.currency === "INR" ? "₹" : (opp.currency === "USD" ? "$" : (opp.currency === "GBP" ? "£" : (opp.currency === "EUR" ? "€" : `${opp.currency || "AED"} `))))}{Number(opp.estimatedBudgetMax).toLocaleString()}
                   </span>
 
                   <Link

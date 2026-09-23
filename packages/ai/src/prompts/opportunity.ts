@@ -4,6 +4,7 @@ export interface CompanyAnalysisPromptInput {
   companyName: string;
   industry?: string | null;
   location?: string | null;
+  country?: string | null;
   website?: string | null;
   phone?: string | null;
   email?: string | null;
