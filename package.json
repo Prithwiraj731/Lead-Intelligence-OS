@@ -1,0 +1,18 @@
+{
+  "name": "lead-intelligence-os",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "pnpm --filter @leadintel/web dev",
+    "build": "pnpm --filter @leadintel/database db:generate && pnpm --filter @leadintel/web build",
+    "db:generate": "pnpm --filter @leadintel/database db:generate",
+    "db:push": "pnpm --filter @leadintel/database db:push",
+    "db:seed": "pnpm --filter @leadintel/database db:seed",
+    "db:migrate": "pnpm --filter @leadintel/database db:migrate",
+    "test": "pnpm --filter @leadintel/web test"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.4",
+    "typescript": "^5.7.3"
+  }
+}

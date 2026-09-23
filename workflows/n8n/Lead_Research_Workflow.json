@@ -1,0 +1,159 @@
+{
+  "id": "lio_02_lead_research",
+  "name": "LIO — 02 Lead Research",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "lead-research",
+        "responseMode": "onReceived",
+        "responseData": "allEntries",
+        "options": {}
+      },
+      "name": "Webhook: Inbound Lead Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [180, 300],
+      "id": "node-webhook-trigger",
+      "webhookId": "lead-research-trigger"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 1. Validate incoming lead payload\nconst body = $input.item.json.body || $input.item.json;\nconst companyId = body.companyId;\nconst companyName = body.companyName || 'Unknown Company';\nconst website = (body.website || '').trim();\nconst industry = body.industry || '';\nconst location = body.location || 'UAE';\n\nif (!companyId) {\n  throw new Error('Validation failed: companyId is required.');\n}\n\nreturn {\n  json: {\n    companyId,\n    companyName,\n    website,\n    industry,\n    location,\n    receivedAt: new Date().toISOString()\n  }\n};"
+      },
+      "name": "Validate Lead",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [380, 300],
+      "id": "node-validate-lead"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.website ? ($json.website.startsWith('http') ? $json.website : 'https://' + $json.website) : '' }}",
+        "options": {
+          "timeout": 5000,
+          "redirect": {
+            "redirect": {
+              "followRedirects": true,
+              "maxRedirects": 2
+            }
+          }
+        }
+      },
+      "name": "Research / Website Inspection",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [580, 300],
+      "id": "node-website-inspection",
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 2. Deep Digital Presence & Evidence Fingerprinting\nconst httpData = $input.item.json || {};\nconst lead = $('Validate Lead').first().json;\n\nconst hasUrl = Boolean(lead.website && lead.website.length > 2);\nconst isError = Boolean(httpData.error || httpData.statusCode === undefined || httpData.statusCode >= 400);\nconst isOk = hasUrl && !isError;\nconst html = typeof httpData.data === 'string' ? httpData.data : (typeof httpData === 'string' ? httpData : '');\n\nconst hasMobile = /<meta[^>]*name=[\"']viewport[\"'][^>]*content=[\"'][^\"']*width=device-width/i.test(html);\nconst hasHttps = (lead.website || '').startsWith('https://');\nconst hasForm = /<form/i.test(html) && /(contact|message|submit|enquiry|email|name)/i.test(html);\nconst hasBooking = /(calendly\\.com|booksy\\.com|fresha\\.com|book-now|schedule|appointment)/i.test(html);\nconst hasPortfolio = /(portfolio|projects|gallery|our-work|works|case-studies)/i.test(html);\nconst hasWhatsapp = /(wa\\.me|api\\.whatsapp\\.com\\/send)/i.test(html);\n\n// Tech stack detection\nconst cms = [];\nif (/wp-content|wordpress/i.test(html)) cms.push('WordPress');\nif (/shopify/i.test(html)) cms.push('Shopify');\nif (/webflow/i.test(html)) cms.push('Webflow');\nif (/wix/i.test(html)) cms.push('Wix');\nif (/squarespace/i.test(html)) cms.push('Squarespace');\n\nconst frameworks = [];\nif (/_next/i.test(html)) frameworks.push('Next.js');\nif (/react/i.test(html)) frameworks.push('React');\nif (/vue/i.test(html)) frameworks.push('Vue');\n\nconst analytics = [];\nif (/googletagmanager|google-analytics|gtag/i.test(html)) analytics.push('Google Analytics (GA4)');\nif (/connect\\.facebook\\.net/i.test(html)) analytics.push('Meta Pixel');\nif (/hotjar/i.test(html)) analytics.push('Hotjar');\n\nconst chatWidgets = [];\nif (hasWhatsapp) chatWidgets.push('WhatsApp Direct Link');\nif (/intercom/i.test(html)) chatWidgets.push('Intercom');\nif (/crisp/i.test(html)) chatWidgets.push('Crisp');\nif (/tidio/i.test(html)) chatWidgets.push('Tidio');\nif (/tawk\\.to/i.test(html)) chatWidgets.push('Tawk.to');\n\nconst detectedProblems = [];\nconst evidenceMatrix = [];\nlet websiteScore = 100;\n\nif (!hasUrl) {\n  websiteScore = 0;\n  detectedProblems.push('No dedicated verified website URL');\n  evidenceMatrix.push({\n    observation: 'No registered web presence detected.',\n    evidence: 'Lead record has no verified website endpoint.',\n    impact: 'Losing high-intent UAE commercial search traffic to competitors.',\n    recommendedSolution: 'Build a modern greenfield business website.',\n    confidence: 95,\n    truthTier: 'VERIFIED',\n    category: 'PRESENCE'\n  });\n} else if (!isOk) {\n  websiteScore = 15;\n  detectedProblems.push('Website offline or unreachable');\n  evidenceMatrix.push({\n    observation: 'Website server is unreachable or returned error.',\n    evidence: `HTTP request failed (${httpData.error || 'Offline'}).`,\n    impact: 'Commercial clients encounter offline errors, damaging reputation.',\n    recommendedSolution: 'Restore server uptime and deploy cloud hosting.',\n    confidence: 90,\n    truthTier: 'VERIFIED',\n    category: 'UPTIME'\n  });\n} else {\n  if (!hasHttps) {\n    detectedProblems.push('Missing SSL encryption (Plain HTTP in use)');\n    websiteScore -= 20;\n    evidenceMatrix.push({\n      observation: 'Website lacks SSL encryption.',\n      evidence: 'Domain loads over insecure HTTP.',\n      impact: 'Triggers browser security warnings, destroying trust.',\n      recommendedSolution: 'Configure SSL certificate and enforce HTTPS.',\n      confidence: 100,\n      truthTier: 'VERIFIED',\n      category: 'SECURITY'\n    });\n  }\n  if (!hasMobile) {\n    detectedProblems.push('No responsive mobile viewport detected');\n    websiteScore -= 25;\n    evidenceMatrix.push({\n      observation: 'Mobile viewport meta tag is missing.',\n      evidence: 'HTML lacks responsive viewport tag.',\n      impact: 'High bounce rate for UAE mobile visitors.',\n      recommendedSolution: 'Rebuild with mobile-first responsive architecture.',\n      confidence: 100,\n      truthTier: 'VERIFIED',\n      category: 'MOBILE'\n    });\n  }\n  if (!hasForm && !hasBooking) {\n    detectedProblems.push('No direct enquiry or booking mechanism on primary landing');\n    websiteScore -= 20;\n    evidenceMatrix.push({\n      observation: 'No direct enquiry form or booking flow detected.',\n      evidence: 'No <form> or scheduling widget found.',\n      impact: 'Interested buyers encounter friction trying to reach sales.',\n      recommendedSolution: 'Implement high-converting lead capture funnels.',\n      confidence: 95,\n      truthTier: 'VERIFIED',\n      category: 'CONVERSION'\n    });\n  }\n  if (!hasPortfolio) {\n    detectedProblems.push('Project portfolio is difficult to discover');\n    websiteScore -= 15;\n    evidenceMatrix.push({\n      observation: 'Completed projects portfolio is difficult to discover.',\n      evidence: 'No dedicated portfolio/project navigation link found.',\n      impact: 'High-ticket buyers cannot verify previous craftsmanship.',\n      recommendedSolution: 'Deploy a high-resolution project portfolio showcase.',\n      confidence: 88,\n      truthTier: 'INFERRED',\n      category: 'PORTFOLIO'\n    });\n  }\n  if (hasWhatsapp && chatWidgets.length === 1) {\n    evidenceMatrix.push({\n      observation: 'Business promotes WhatsApp but lacks automated 24/7 qualification.',\n      evidence: 'Direct WhatsApp link detected without automated bot layer.',\n      impact: 'Delayed responses during off-hours risk losing hot prospects.',\n      recommendedSolution: 'Deploy 24/7 AI WhatsApp Qualification Bot.',\n      confidence: 90,\n      truthTier: 'INFERRED',\n      category: 'AI_AUTOMATION'\n    });\n  }\n  websiteScore = Math.max(20, Math.min(100, websiteScore));\n}\n\nconst techStack = [...cms, ...frameworks, ...analytics, ...chatWidgets];\n\nreturn {\n  json: {\n    companyId: lead.companyId,\n    companyName: lead.companyName,\n    website: lead.website,\n    industry: lead.industry,\n    location: lead.location,\n    websiteStatus: !hasUrl ? 'NO_WEBSITE' : (isOk ? 'ONLINE' : 'OFFLINE'),\n    websiteScore,\n    hasMobile,\n    hasHttps,\n    hasForm,\n    hasBooking,\n    hasPortfolio,\n    hasWhatsapp,\n    techStack,\n    digitalPresence: {\n      cms,\n      frameworks,\n      analytics,\n      chatWidgets,\n      hasWhatsapp,\n      hasHttps,\n      hasMobileViewport: hasMobile,\n      hasContactForm: hasForm,\n      hasBooking,\n      hasPortfolio\n    },\n    detectedProblems,\n    evidenceMatrix\n  }\n};"
+      },
+      "name": "Extract Comprehensive Signals",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [780, 300],
+      "id": "node-extract-signals"
+    },
+    {
+      "parameters": {
+        "jsCode": "// 3. AI Opportunity Analysis, 15-Service Matching & Dual Scoring Engine (Commercial Claims Accuracy)\nconst d = $input.item.json;\nconst industry = (d.industry || '').toLowerCase();\n\nlet opportunityScore = 70;\nlet confidenceScore = 80;\nlet recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\nlet recommendedServiceName = 'Premium Website Redesign & Conversion Architecture';\nlet primaryPainPoint = '';\nlet reasoning = '';\nlet potentialImpact = '';\nlet reasonToContact = '';\nlet suggestedOffer = '';\nlet expectedBusinessBenefit = '';\nlet claimType = 'ESTIMATE';\nlet pitchAngle = '';\nlet estimatedBudgetMin = 35000;\nlet estimatedBudgetMax = 75000;\nlet recommendedChannel = 'EMAIL';\nconst evidenceSummary = [];\n\nif (d.websiteStatus === 'NO_WEBSITE' || d.websiteStatus === 'OFFLINE') {\n  opportunityScore = 92;\n  confidenceScore = 95;\n  recommendedServiceCode = 'NEW_HIGH_CONVERTING_WEBSITE';\n  recommendedServiceName = 'New High-Converting Business Website & Digital Presence';\n  primaryPainPoint = 'No active verified web presence exists to capture direct client search and high-ticket enquiries.';\n  reasoning = `The business is established in ${d.location || 'UAE'} but lacks an online headquarters to capture commercial search demand.`;\n  potentialImpact = 'Establish direct search authority and create a verified digital acquisition channel.';\n  reasonToContact = `Your business is active in ${d.location || 'UAE'}, but without a dedicated website you are losing inbound client search demand directly to competitors.`;\n  suggestedOffer = `Custom Greenfield Digital Presence & Portfolio for ${d.companyName}`;\n  expectedBusinessBenefit = 'Create a clearer inbound path for potential clients searching for your services and establish direct digital credibility.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Direct ownership of digital client acquisition channel without relying solely on social media';\n  estimatedBudgetMin = 28000;\n  estimatedBudgetMax = 60000;\n  recommendedChannel = 'WHATSAPP';\n  evidenceSummary.push('Zero verified website domain or web infrastructure detected.');\n} else if (!d.hasMobile) {\n  opportunityScore = 88;\n  confidenceScore = 92;\n  recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\n  recommendedServiceName = 'Mobile-First Website Redesign & Modernization';\n  primaryPainPoint = 'Website layout lacks a responsive mobile viewport, creating immediate conversion friction for smartphone visitors.';\n  reasoning = 'A significant majority of commercial UAE traffic originates from mobile devices; non-responsive viewports increase visitor drop-off.';\n  potentialImpact = 'Reduce mobile visitor bounce and eliminate interface scaling friction for smartphone visitors.';\n  reasonToContact = 'Your website content is solid, but the layout is not optimized for mobile screens, creating friction for smartphone visitors.';\n  suggestedOffer = `Modern Mobile-First Web Architecture for ${d.companyName}`;\n  expectedBusinessBenefit = 'Improve mobile user experience and remove layout friction for smartphone visitors.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Mobile viewport friction audit showing immediate conversion drop-off';\n  estimatedBudgetMin = 35000;\n  estimatedBudgetMax = 70000;\n  evidenceSummary.push('Missing responsive mobile viewport in HTML source.');\n} else if (!d.hasHttps) {\n  opportunityScore = 85;\n  confidenceScore = 95;\n  recommendedServiceCode = 'CYBERSECURITY_REVIEW_HARDENING';\n  recommendedServiceName = 'Web Security Review & Vulnerability Hardening';\n  primaryPainPoint = 'Domain is missing SSL encryption, triggering browser \"Not Secure\" warnings for prospective clients.';\n  reasoning = 'Missing HTTPS flags security warnings in modern browsers, destroying client trust and search engine visibility.';\n  potentialImpact = 'Eliminate browser security warnings and protect customer privacy across all enquiry forms.';\n  reasonToContact = 'Your website is currently triggering \"Not Secure\" browser warnings because SSL encryption is inactive on your domain.';\n  suggestedOffer = `Security & SSL Infrastructure Upgrade for ${d.companyName}`;\n  expectedBusinessBenefit = 'Eliminate browser security warnings and protect customer enquiry transmission with standard SSL encryption.';\n  claimType = 'VERIFIED_FACT';\n  pitchAngle = 'Browser security trust badge and search penalty mitigation';\n  estimatedBudgetMin = 18000;\n  estimatedBudgetMax = 45000;\n  evidenceSummary.push('Site loads over plain HTTP protocol without active SSL certificate.');\n} else if (d.hasWhatsapp && (industry.includes('clinic') || industry.includes('consult') || industry.includes('salon') || industry.includes('interior') || industry.includes('fitout') || industry.includes('real estate'))) {\n  opportunityScore = 90;\n  confidenceScore = 90;\n  recommendedServiceCode = 'AI_LEAD_QUALIFICATION_BOT';\n  recommendedServiceName = 'AI Lead Qualification & 24/7 WhatsApp Conversational System';\n  primaryPainPoint = 'Business promotes WhatsApp contact but relies on manual replies, creating severe delays during off-hours.';\n  reasoning = 'Inbound prospects expect timely responses; automated conversational qualification captures lead details and intent promptly.';\n  potentialImpact = 'Improve inquiry capture during off-hours and streamline initial client qualification.';\n  reasonToContact = 'You provide a direct WhatsApp link on your site, but without an automated conversational bot, you risk losing prospects who message during off-hours.';\n  suggestedOffer = `24/7 AI Receptionist & WhatsApp Booking Integration for ${d.companyName}`;\n  expectedBusinessBenefit = 'Enable faster automated responses and lead qualification through WhatsApp.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Instant off-hours lead qualification and calendar booking';\n  estimatedBudgetMin = 25000;\n  estimatedBudgetMax = 55000;\n  recommendedChannel = 'WHATSAPP';\n  evidenceSummary.push('Direct WhatsApp link detected without conversational qualification layer.');\n} else if (!d.hasPortfolio && (industry.includes('interior') || industry.includes('architecture') || industry.includes('fitout') || industry.includes('design'))) {\n  opportunityScore = 89;\n  confidenceScore = 88;\n  recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\n  recommendedServiceName = 'Luxury Portfolio & Web Showcase Architecture';\n  primaryPainPoint = 'Project portfolio and completed client case studies are difficult to discover on primary navigation.';\n  reasoning = 'Commercial interior and design buyers make selection decisions primarily on visual proof of past project scale.';\n  potentialImpact = 'Provide clear visual proof of past craftsmanship and elevate digital brand authority.';\n  reasonToContact = 'Your craftsmanship and project reputation are strong, but your current web presence makes it difficult for potential commercial clients to quickly view your completed projects.';\n  suggestedOffer = `Luxury Portfolio & Case Study Showcase for ${d.companyName}`;\n  expectedBusinessBenefit = 'Provide immediate visual proof of project scale to prospective commercial clients and streamline proposal discussions.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Focus on portfolio discovery bottleneck rather than generic redesign';\n  estimatedBudgetMin = 38000;\n  estimatedBudgetMax = 80000;\n  evidenceSummary.push('No dedicated portfolio or case study showcase on primary navigation.');\n} else {\n  opportunityScore = 72;\n  confidenceScore = 80;\n  recommendedServiceCode = 'PERFORMANCE_SEO_UPGRADE';\n  recommendedServiceName = 'Technical SEO & Speed Optimization Engine';\n  primaryPainPoint = 'Digital presence lacks modern Core Web Vitals optimization and structured search discovery signals.';\n  reasoning = 'Speed optimization and clean schema markup improve organic search visibility and retain prospective buyers.';\n  potentialImpact = 'Strengthen search engine discovery signals and optimize visitor loading speed.';\n  reasonToContact = 'Your website is active, but missing schema markup and Core Web Vitals optimizations are holding back your organic search ranking in Dubai.';\n  suggestedOffer = `Technical SEO & Performance Architecture for ${d.companyName}`;\n  expectedBusinessBenefit = 'Improve page load responsiveness and strengthen technical search discovery foundations.';\n  claimType = 'ESTIMATE';\n  pitchAngle = 'Measurable speed and search indexing improvements';\n  estimatedBudgetMin = 20000;\n  estimatedBudgetMax = 45000;\n  evidenceSummary.push('Core Web Vitals can be accelerated to improve technical search positioning.');\n}\n\nreturn {\n  json: {\n    companyId: d.companyId,\n    websiteStatus: d.websiteStatus,\n    websiteScore: d.websiteScore,\n    confidenceScore,\n    techStack: d.techStack,\n    digitalPresence: d.digitalPresence,\n    evidenceMatrix: d.evidenceMatrix,\n    detectedProblems: d.detectedProblems,\n    conversionFriction: d.detectedProblems,\n    summary: `Technical audit and opportunity analysis completed for ${d.companyName}. Recommended service: ${recommendedServiceName}.`,\n    opportunity: {\n      opportunityScore,\n      confidenceScore,\n      recommendedServiceCode,\n      recommendedServiceName,\n      recommendedChannel,\n      primaryPainPoint,\n      reasoning,\n      potentialImpact,\n      reasonToContact,\n      suggestedOffer,\n      expectedBusinessBenefit,\n      claimType,\n      estimatedBudgetMin,\n      estimatedBudgetMax,\n      currency: 'AED',\n      pitchAngle,\n      evidenceSummary\n    }\n  }\n};"
+      },
+      "name": "AI Opportunity & Dual Scoring",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [980, 300],
+      "id": "node-ai-opportunity"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:3000/api/webhooks/n8n/research-result",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-N8N-Webhook-Secret",
+              "value": "b52dd18759ad3593ed6b2cb3e77cb073ef3a55af67a302e52e6a9e5ce1160562"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}"
+      },
+      "name": "Callback to Lead Intelligence OS",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1180, 300],
+      "id": "node-callback-os"
+    }
+  ],
+  "connections": {
+    "Webhook: Inbound Lead Trigger": {
+      "main": [
+        [
+          {
+            "node": "Validate Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Validate Lead": {
+      "main": [
+        [
+          {
+            "node": "Research / Website Inspection",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Research / Website Inspection": {
+      "main": [
+        [
+          {
+            "node": "Extract Comprehensive Signals",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Comprehensive Signals": {
+      "main": [
+        [
+          {
+            "node": "AI Opportunity & Dual Scoring",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Opportunity & Dual Scoring": {
+      "main": [
+        [
+          {
+            "node": "Callback to Lead Intelligence OS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  }
+}

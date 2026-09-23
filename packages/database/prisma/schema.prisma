@@ -1,0 +1,389 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ----------------------------------------------------
+// 1. COMPANIES & CONTACTS
+// ----------------------------------------------------
+
+model Company {
+  id               String   @id @default(uuid())
+  name             String
+  normalizedName   String
+  domain           String?
+  normalizedDomain String?
+  phone            String?
+  normalizedPhone  String?
+  industry         String?
+  location         String?
+  country          String?  @default("UAE")
+  city             String?
+  address          String?
+  description      String?
+  source           String   @default("CSV_IMPORT")
+  status           String   @default("NEW") // NEW, RESEARCHING, RESEARCHED, OPPORTUNITY_IDENTIFIED, OUTREACH_READY, OUTREACH_APPROVED, OUTREACH_SENT, REPLIED, SUPPRESSED, ARCHIVED
+  notes            String?
+
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  contacts         Contact[]
+  research         CompanyResearch?
+  opportunities    Opportunity[]
+  messages         Message[]
+  deliveries       Delivery[]
+  auditLogs        AuditLog[]
+
+  @@index([normalizedDomain])
+  @@index([normalizedPhone])
+  @@index([normalizedName, city])
+  @@index([status])
+  @@index([industry])
+  @@map("companies")
+}
+
+model Contact {
+  id           String    @id @default(uuid())
+  companyId    String
+  name         String
+  role         String?
+  email        String?
+  phone        String?
+  linkedinUrl  String?
+  isPrimary          Boolean   @default(false)
+  isVerified         Boolean   @default(false)
+  identityConfidence Int       @default(0) // 0 - 100
+  verificationSource String?   // MANUAL_INPUT, TEAM_PAGE, OFFICIAL_REGISTRY, CSV_VERIFIED
+  isSuppressed       Boolean   @default(false)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  company      Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  messages     Message[]
+  deliveries   Delivery[]
+  replies      Reply[]
+
+  @@index([companyId])
+  @@index([email])
+  @@index([phone])
+  @@map("contacts")
+}
+
+// ----------------------------------------------------
+// 2. RESEARCH ENGINE & WEBSITE AUDIT
+// ----------------------------------------------------
+
+model CompanyResearch {
+  id                  String   @id @default(uuid())
+  companyId           String   @unique
+  websiteUrl          String?
+  websiteStatus       String   @default("UNKNOWN") // ONLINE, OFFLINE, NOT_FOUND, NO_WEBSITE, REDIRECTED, SSL_ERROR, TIMEOUT, BLOCKED
+  websiteScore        Int      @default(0) // 0 - 100
+  confidenceScore     Int      @default(0) // 0 - 100
+  status              String   @default("PENDING") // PENDING, COMPLETED, FAILED
+
+  // Structured Signals (JSON)
+  techStack           Json?    @default("[]")
+  performanceSignals  Json?    @default("{}")
+  seoSignals          Json?    @default("{}")
+  detectedProblems    Json?    @default("[]")
+  verifiedServices    Json?    @default("[]")
+  contactSignals      Json?    @default("{}")
+  qualitySignals      Json?    @default("{}")
+  truthTiers          Json?    @default("{}") // maps field -> VERIFIED | INFERRED | UNKNOWN
+  subPagesAudited     Json?    @default("[]") // Array of SubPageAudit objects
+  digitalPresence     Json?    @default("{}") // Structured DigitalPresence signals
+  evidenceMatrix      Json?    @default("[]") // Array of EvidenceItem objects
+  conversionFriction  Json?    @default("[]") // Specific friction points detected
+
+  summary             String?
+  rawAuditData        Json?
+  errorMessage        String?
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  company             Company  @relation(fields: [companyId], references: [id], onDelete: Cascade)
+
+  @@index([companyId])
+  @@index([status])
+  @@index([confidenceScore])
+  @@map("company_research")
+}
+
+// ----------------------------------------------------
+// 3. OPPORTUNITIES & SERVICE CATALOG
+// ----------------------------------------------------
+
+model ServiceCatalog {
+  id                 String   @id @default(uuid())
+  code               String   @unique // e.g. PREMIUM_WEBSITE_REDESIGN, AI_LEAD_QUALIFICATION_BOT
+  name               String
+  category           String   // WEB_DEV, AI_AUTOMATION, CYBERSECURITY, DIGITAL_INFRA
+  description        String
+  targetProblems     Json     @default("[]")
+  typicalValueProp   String
+  estimatedPriceMin  Decimal  @default(0)
+  estimatedPriceMax  Decimal  @default(0)
+  currency           String   @default("AED")
+  isActive           Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  opportunities      Opportunity[]
+
+  @@map("service_catalog")
+}
+
+model Opportunity {
+  id                      String          @id @default(uuid())
+  companyId               String
+  serviceId               String?
+  opportunityScore        Int             @default(0) // 0 - 100
+  confidenceScore         Int             @default(0) // 0 - 100
+  recommendedChannel      String          @default("EMAIL") // EMAIL, WHATSAPP, LINKEDIN
+  primaryPainPoint        String
+  reasoning               String
+  potentialImpact         String
+  reasonToContact         String?
+  suggestedOffer          String
+  expectedBusinessBenefit String?
+  claimType               String?         @default("ESTIMATE") // VERIFIED_FACT, INFERRED_INSIGHT, ESTIMATE, UNKNOWN
+  estimatedBudgetMin      Decimal         @default(0)
+  estimatedBudgetMax      Decimal         @default(0)
+  currency                String          @default("AED")
+  pitchAngle              String
+  evidenceSummary         Json?           @default("[]")
+  status                  String          @default("IDENTIFIED") // IDENTIFIED, ACCEPTED, DISMISSED, CONVERTED
+
+  createdAt            DateTime        @default(now())
+  updatedAt            DateTime        @updatedAt
+
+  company              Company         @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  service              ServiceCatalog? @relation(fields: [serviceId], references: [id], onDelete: SetNull)
+  messages             Message[]
+
+  @@index([companyId])
+  @@index([opportunityScore])
+  @@index([status])
+  @@map("opportunities")
+}
+
+// ----------------------------------------------------
+// 4. MESSAGES & HUMAN APPROVAL GATE
+// ----------------------------------------------------
+
+model Message {
+  id                  String         @id @default(uuid())
+  companyId           String
+  contactId           String?
+  opportunityId       String?
+  campaignId          String?
+  channel             String         @default("EMAIL") // EMAIL, WHATSAPP
+  status              String         @default("DRAFT") // DRAFT, READY_FOR_REVIEW, APPROVED, SCHEDULED, SENT, FAILED, REPLIED, CLOSED, REJECTED
+
+  // Message Content
+  emailSubject        String?
+  emailBody           String?
+  whatsappBody        String?
+  followupBody        String?
+
+  // Strategic Building Blocks & Intelligence
+  outreachAngle       String?
+  verifiedObservation String?
+  proposedSolution    String?
+  callToAction        String?
+  evidenceUsed        Json?          @default("[]")
+  qualityScore        Int?           @default(0)
+  qualityReport       Json?          @default("{}")
+
+  // Review & Approval Audit
+  approvedBy          String?
+  approvalNotes       String?
+  approvedAt          DateTime?
+  scheduledAt         DateTime?
+  sentAt              DateTime?
+  failedReason        String?
+
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  company             Company        @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact             Contact?       @relation(fields: [contactId], references: [id], onDelete: SetNull)
+  opportunity         Opportunity?   @relation(fields: [opportunityId], references: [id], onDelete: SetNull)
+  campaign            Campaign?      @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  events              MessageEvent[]
+  deliveries          Delivery[]
+  replies             Reply[]
+  followups           Followup[]
+
+  @@index([companyId])
+  @@index([contactId])
+  @@index([status])
+  @@index([channel])
+  @@map("messages")
+}
+
+model Delivery {
+  id                 String    @id @default(uuid())
+  messageId          String
+  companyId          String
+  contactId          String?
+  channel            String    @default("EMAIL") // EMAIL, WHATSAPP
+  provider           String    @default("DRY_RUN") // DRY_RUN, RESEND, SMTP, WHATSAPP_BUSINESS_API
+  providerMessageId  String?
+  idempotencyKey     String    @unique
+  status             String    @default("DRY_RUN") // QUEUED, PROCESSING, SENT, DELIVERED, BOUNCED, FAILED, CANCELLED, DRY_RUN
+  recipient          String
+  subject            String?
+  body               String
+  safetyCheckReport  Json?     @default("{}")
+  attempts           Int       @default(1)
+  isDryRun           Boolean   @default(true)
+  sentAt             DateTime?
+  deliveredAt        DateTime?
+  failedAt           DateTime?
+  failureReason      String?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  message            Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  company            Company   @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  contact            Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([messageId])
+  @@index([companyId])
+  @@index([contactId])
+  @@index([status])
+  @@index([recipient])
+  @@index([createdAt])
+  @@map("deliveries")
+}
+
+model MessageEvent {
+  id        String   @id @default(uuid())
+  messageId String
+  eventType String   // GENERATED, READY_FOR_REVIEW, APPROVED, EDITED, REGENERATED, REJECTED, SCHEDULED, SENT, DELIVERED, OPENED, CLICKED, BOUNCED, FAILED
+  metadata  Json?    @default("{}")
+  createdAt DateTime @default(now())
+
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([eventType])
+  @@map("message_events")
+}
+
+// ----------------------------------------------------
+// 5. REPLIES, FOLLOWUPS & SUPPRESSION
+// ----------------------------------------------------
+
+model Reply {
+  id             String    @id @default(uuid())
+  messageId      String
+  contactId      String?
+  classification String    // INTERESTED, PRICING, MEETING_REQUEST, MORE_INFORMATION, MAYBE_LATER, NOT_INTERESTED, WRONG_CONTACT, OPT_OUT, OTHER
+  rawText        String
+  sentiment      String?   // POSITIVE, NEUTRAL, NEGATIVE
+  handled        Boolean   @default(false)
+  handledNotes   String?
+  receivedAt     DateTime  @default(now())
+  createdAt      DateTime  @default(now())
+
+  message        Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  contact        Contact?  @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([messageId])
+  @@index([classification])
+  @@map("replies")
+}
+
+model Followup {
+  id           String    @id @default(uuid())
+  messageId    String
+  stepNumber   Int       @default(1)
+  scheduledFor DateTime
+  status       String    @default("PENDING") // PENDING, READY_FOR_REVIEW, APPROVED, SENT, CANCELLED
+  body         String
+  sentAt       DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  message      Message   @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([status])
+  @@map("followups")
+}
+
+model Suppression {
+  id        String   @id @default(uuid())
+  email     String?  @unique
+  domain    String?  @unique
+  phone     String?  @unique
+  reason    String   // OPT_OUT, BOUNCE, MANUAL_BLOCK, COMPLAINT
+  source    String   @default("SYSTEM")
+  createdAt DateTime @default(now())
+
+  @@index([email])
+  @@index([domain])
+  @@index([phone])
+  @@map("suppressions")
+}
+
+// ----------------------------------------------------
+// 6. CAMPAIGNS, EXPERIMENTS & AUDIT LOGS
+// ----------------------------------------------------
+
+model Campaign {
+  id              String       @id @default(uuid())
+  name            String
+  targetIndustry  String?
+  status          String       @default("DRAFT") // DRAFT, ACTIVE, PAUSED, COMPLETED
+  dailyLimit      Int          @default(20)
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+
+  messages        Message[]
+  experiments     Experiment[]
+
+  @@map("campaigns")
+}
+
+model Experiment {
+  id             String    @id @default(uuid())
+  campaignId     String
+  name           String
+  variantA       Json      // subject, angle, CTA
+  variantB       Json      // subject, angle, CTA
+  metrics        Json?     @default("{}")
+  winnerVariant  String?   // A, B, NONE
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  campaign       Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+
+  @@index([campaignId])
+  @@map("experiments")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  companyId String?
+  action    String   // LEAD_IMPORTED, RESEARCH_STARTED, RESEARCH_COMPLETED, OPPORTUNITY_GENERATED, MESSAGE_GENERATED, MESSAGE_APPROVED, etc.
+  actor     String   @default("SYSTEM") // USER, SYSTEM, N8N
+  details   Json?    @default("{}")
+  createdAt DateTime @default(now())
+
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+
+  @@index([companyId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
