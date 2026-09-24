@@ -26,6 +26,7 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [bootSequence, setBootSequence] = useState(false);
+  const [isRevealing, setIsRevealing] = useState(false);
 
   const fetchMetrics = async () => {
     try {
@@ -46,6 +47,12 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchMetrics();
+    // Check if entered from homepage with modern shutter reveal
+    if (typeof window !== "undefined" && window.location.search.includes("reveal")) {
+      setIsRevealing(true);
+      const revealTimer = setTimeout(() => setIsRevealing(false), 700);
+      return () => clearTimeout(revealTimer);
+    }
     // Trigger smooth boot sequence animation
     const timer = setTimeout(() => setBootSequence(true), 80);
     return () => clearTimeout(timer);
@@ -62,11 +69,33 @@ export default function DashboardPage() {
   };
 
   return (
-    <div
-      className={`space-y-8 pb-12 transition-all duration-700 ease-out ${
-        bootSequence ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-6 scale-[0.99]"
-      }`}
-    >
+    <>
+      {/* Alternating Horizontal Kinetic Shutter Blocks Opening Reveal */}
+      {isRevealing && (
+        <div className="fixed inset-0 z-50 pointer-events-none flex flex-col justify-between overflow-hidden">
+          {[0, 1, 2, 3, 4, 5, 6].map((index) => {
+            const isEven = index % 2 === 0;
+            return (
+              <div
+                key={index}
+                className={`w-full flex-1 bg-[#07080c] border-y border-white/[0.08] ${
+                  isEven ? "animate-shutter-out-right" : "animate-shutter-out-left"
+                }`}
+                style={{
+                  animationDelay: `${index * 35}ms`,
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      <div
+        className={`space-y-8 pb-12 transition-all duration-700 ease-out ${
+          bootSequence ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-6 scale-[0.99]"
+        }`}
+      >
+
       {/* Sci-Fi Entrance Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6 relative overflow-hidden">
         {/* Subtle background glow */}
@@ -360,5 +389,7 @@ export default function DashboardPage() {
         </div>
       </div>
     </div>
-  );
+  </>
+);
 }
+

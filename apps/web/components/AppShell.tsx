@@ -18,9 +18,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isHomepage = pathname === "/";
 
-  // If on the homepage, render pure full-bleed immersive canvas
+  // If on the homepage, render pure full-bleed immersive canvas (strict single-screen hero, no scroll)
   if (isHomepage) {
-    return <div className="min-h-screen w-full flex flex-col bg-[#07080c] text-slate-100 overflow-x-hidden">{children}</div>;
+    return <div className="h-screen max-h-screen w-full flex flex-col bg-[#07080c] text-slate-100 overflow-hidden select-none">{children}</div>;
   }
 
   // Otherwise, render the standard enterprise app shell

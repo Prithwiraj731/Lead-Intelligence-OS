@@ -71,6 +71,43 @@ body {
   box-shadow: 0 12px 24px -10px rgba(0, 0, 0, 0.5);
 }
 
+/* Kinetic Alternating Shutter Reveal Keyframes */
+@keyframes shutterSlideInLeft {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes shutterSlideInRight {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0%); }
+}
+
+@keyframes shutterSlideOutLeft {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes shutterSlideOutRight {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shutter-in-left {
+  animation: shutterSlideInLeft 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shutter-in-right {
+  animation: shutterSlideInRight 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-shutter-out-left {
+  animation: shutterSlideOutLeft 0.42s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
+.animate-shutter-out-right {
+  animation: shutterSlideOutRight 0.42s cubic-bezier(0.77, 0, 0.175, 1) forwards;
+}
+
 /* Subtle Glow Effects */
 .glow-primary {
   box-shadow: 0 0 24px -4px rgba(99, 102, 241, 0.25);
@@ -87,3 +124,4 @@ body {
 .glow-rose {
   box-shadow: 0 0 24px -4px rgba(244, 63, 94, 0.2);
 }
+
