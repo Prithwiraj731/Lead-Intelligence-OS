@@ -5,7 +5,14 @@ export async function GET(req: NextRequest) {
   try {
     const code = req.nextUrl.searchParams.get("code");
     const error = req.nextUrl.searchParams.get("error");
-    const returnTo = req.nextUrl.searchParams.get("returnTo") || "/pilot";
+    const state = req.nextUrl.searchParams.get("state");
+    let returnTo = req.nextUrl.searchParams.get("returnTo") || "/pilot";
+    if (state) {
+      try {
+        const decoded = JSON.parse(Buffer.from(state, "base64url").toString("utf-8"));
+        if (decoded.returnTo) returnTo = decoded.returnTo;
+      } catch {}
+    }
 
     if (error) {
       return NextResponse.redirect(

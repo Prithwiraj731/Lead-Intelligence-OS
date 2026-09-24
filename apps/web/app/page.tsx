@@ -6,16 +6,17 @@ import {
   Sparkles,
   Layers,
   CheckCircle2,
-  Send,
   Upload,
   ArrowRight,
   TrendingUp,
-  ShieldCheck,
   Search,
   ExternalLink,
   Clock,
   AlertCircle,
   FileCheck,
+  Building2,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
 
 export default function DashboardPage() {
@@ -55,202 +56,235 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="space-y-8">
-      {/* Top Welcome & Command Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6">
+    <div className="space-y-8 pb-12">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
         <div>
-          <div className="flex items-center space-x-2">
-            <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-blue-950/80 border border-blue-800/60 text-blue-400">
-              COMMAND DECK
+          <div className="flex items-center space-x-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-400"></span>
+              Live Pipeline Active
             </span>
-            <span className="text-xs text-slate-400">Live Database Connected</span>
+            <span className="text-xs text-slate-500">•</span>
+            <span className="text-xs text-slate-400">PostgreSQL Connected</span>
           </div>
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-white mt-1">
-            Lead Intelligence Command Center
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+            Lead Intelligence Command
           </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Automated deep research, opportunity detection, and human-approved high-ticket outreach.
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Automated deep technical research, high-intent opportunity diagnosis, and human-verified outreach dispatch.
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2.5 shrink-0">
           <Link
             href="/leads/import"
-            className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium flex items-center space-x-2 transition-colors shadow-lg shadow-blue-900/20"
+            className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium flex items-center space-x-2 transition-all shadow-md shadow-indigo-600/20 active:scale-95"
           >
             <Upload className="w-3.5 h-3.5" />
-            <span>Import Lead File</span>
+            <span>Import Leads</span>
           </Link>
           <Link
             href="/messages"
-            className="px-4 py-2 rounded-lg bg-card hover:bg-card-hover border border-border text-slate-200 text-xs font-medium flex items-center space-x-2 transition-colors"
+            className="px-4 py-2 rounded-xl bg-card hover:bg-card-hover border border-border text-slate-200 text-xs font-medium flex items-center space-x-2 transition-all hover:border-slate-600 active:scale-95"
           >
             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Review Queue ({metrics.readyForReview})</span>
+            <span>Review Queue</span>
+            {metrics.readyForReview > 0 && (
+              <span className="px-1.5 py-0.2 rounded-full text-[10px] bg-emerald-500/20 text-emerald-300 font-semibold">
+                {metrics.readyForReview}
+              </span>
+            )}
           </Link>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 rounded-lg bg-rose-950/40 border border-rose-800/50 text-rose-300 text-xs flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 text-rose-400" />
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center space-x-3">
+          <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
-        <div className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-            <span>Total Leads</span>
-            <Layers className="w-4 h-4 text-blue-400" />
+      {/* KPI Stats Grid */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+        {/* Total Leads */}
+        <div className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+            <span className="font-medium text-slate-400">Total Leads</span>
+            <div className="w-7 h-7 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-400 group-hover:scale-105 transition-transform">
+              <Layers className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-white">
+          <div className="text-2xl font-bold tracking-tight text-white">
             {metrics.totalLeads}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Normalized in DB</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-medium">In directory</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-            <span>Researched</span>
-            <Search className="w-4 h-4 text-cyan-400" />
+        {/* Researched */}
+        <div className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+            <span className="font-medium text-slate-400">Audited</span>
+            <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 group-hover:scale-105 transition-transform">
+              <Search className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-cyan-400">
+          <div className="text-2xl font-bold tracking-tight text-cyan-400">
             {metrics.researchCompleted}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Audited signals</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-medium">Footprint inspected</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-            <span>High Opp.</span>
-            <Sparkles className="w-4 h-4 text-amber-400" />
+        {/* High Opportunity */}
+        <div className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+            <span className="font-medium text-slate-400">High Yield</span>
+            <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-105 transition-transform">
+              <Sparkles className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-amber-400">
+          <div className="text-2xl font-bold tracking-tight text-amber-400">
             {metrics.highOpportunityLeads}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Score ≥ 80/100</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-medium">Score ≥ 80 / 100</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-            <span>Awaiting Review</span>
-            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        {/* Ready for Review */}
+        <div className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+            <span className="font-medium text-slate-400">Pending Review</span>
+            <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-105 transition-transform">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-emerald-400">
+          <div className="text-2xl font-bold tracking-tight text-emerald-400">
             {metrics.readyForReview}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Human Gate Pending</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-medium">Human sign-off</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-            <span>Approved</span>
-            <FileCheck className="w-4 h-4 text-purple-400" />
+        {/* Approved Outreach */}
+        <div className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+            <span className="font-medium text-slate-400">Approved</span>
+            <div className="w-7 h-7 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400 group-hover:scale-105 transition-transform">
+              <FileCheck className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-purple-400">
+          <div className="text-2xl font-bold tracking-tight text-purple-400">
             {metrics.approvedOutreach}
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Signed off by you</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-medium">Ready to dispatch</p>
         </div>
 
-        <div className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-colors">
-          <div className="flex items-center justify-between text-slate-400 text-xs mb-2">
-            <span>Conversion</span>
-            <TrendingUp className="w-4 h-4 text-blue-400" />
+        {/* Conversion Rate */}
+        <div className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all group">
+          <div className="flex items-center justify-between text-slate-400 text-xs mb-3">
+            <span className="font-medium text-slate-400">Conversion</span>
+            <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-105 transition-transform">
+              <TrendingUp className="w-3.5 h-3.5" />
+            </div>
           </div>
-          <div className="text-2xl font-bold font-mono text-blue-400">
+          <div className="text-2xl font-bold tracking-tight text-indigo-400">
             {metrics.conversionRate}%
           </div>
-          <div className="text-[11px] text-slate-400 mt-1">Positive response</div>
+          <p className="text-[11px] text-slate-500 mt-1 font-medium">Positive yield</p>
         </div>
       </div>
 
-      {/* Main Split: Top Opportunities & Recent Activity */}
+      {/* Main Two-Column Split */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top Opportunities (2 Cols) */}
+        {/* Top Diagnosed Opportunities (2 Cols) */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-amber-400" />
-              <h2 className="text-sm font-semibold text-white tracking-wide uppercase font-mono">
+              <div className="w-6 h-6 rounded-lg bg-amber-500/10 flex items-center justify-center text-amber-400">
+                <Sparkles className="w-3.5 h-3.5" />
+              </div>
+              <h2 className="text-sm font-semibold text-slate-200 tracking-tight">
                 Top Diagnosed Opportunities
               </h2>
             </div>
             <Link
               href="/opportunities"
-              className="text-xs text-blue-400 hover:text-blue-300 flex items-center space-x-1"
+              className="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center space-x-1 group transition-colors"
             >
               <span>View all</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
 
-          {data?.topOpportunities?.length === 0 ? (
-            <div className="p-8 rounded-xl border border-dashed border-border text-center space-y-3 bg-card/40">
-              <p className="text-xs text-slate-400">
-                No opportunities diagnosed yet. Import leads and click "Research" on any company.
+          {loading ? (
+            <div className="p-8 rounded-2xl border border-border bg-card/40 text-center text-slate-500 text-xs">
+              Loading top opportunities...
+            </div>
+          ) : data?.topOpportunities?.length === 0 ? (
+            <div className="p-10 rounded-2xl border border-dashed border-border/80 text-center space-y-3 bg-card/20">
+              <div className="w-10 h-10 rounded-xl bg-card border border-border mx-auto flex items-center justify-center text-slate-500">
+                <Sparkles className="w-5 h-5 text-amber-400/60" />
+              </div>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                No opportunities diagnosed yet. Import leads and click "Research" to trigger deep technical auditing.
               </p>
               <Link
                 href="/leads/import"
-                className="inline-flex items-center space-x-2 text-xs px-3.5 py-1.5 rounded-lg bg-blue-600/30 text-blue-400 border border-blue-500/40 hover:bg-blue-600/40"
+                className="inline-flex items-center space-x-2 text-xs px-4 py-2 rounded-xl bg-indigo-600/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-600/20 transition-all"
               >
                 <Upload className="w-3.5 h-3.5" />
-                <span>Import Dubai Leads CSV</span>
+                <span>Import Lead File</span>
               </Link>
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {data?.topOpportunities?.map((opp: any) => (
                 <div
                   key={opp.id}
-                  className="p-4 rounded-xl bg-card border border-border hover:border-slate-700 transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
+                  className="glass-card p-4 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all flex flex-col sm:flex-row sm:items-center justify-between gap-4 group"
                 >
-                  <div className="space-y-1.5 max-w-lg">
+                  <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
+                      <div className="w-6 h-6 rounded-lg bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-400 font-medium text-[11px] shrink-0">
+                        {opp.company.name.charAt(0).toUpperCase()}
+                      </div>
                       <Link
                         href={`/leads/${opp.company.id}`}
-                        className="text-sm font-semibold text-white group-hover:text-blue-400 transition-colors flex items-center space-x-1.5"
+                        className="text-sm font-medium text-white group-hover:text-indigo-300 transition-colors truncate"
                       >
-                        <span>{opp.company.name}</span>
-                        <ExternalLink className="w-3 h-3 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+                        {opp.company.name}
                       </Link>
-                      <span className="text-[11px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
+                      <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/[0.04] text-slate-400 border border-white/[0.06]">
                         {opp.company.city || opp.company.location || "UAE"}
                       </span>
                     </div>
 
-                    <p className="text-xs text-slate-300 font-medium line-clamp-1">
+                    <p className="text-xs text-slate-300 font-medium truncate">
                       {opp.suggestedOffer || opp.service?.name}
                     </p>
 
-                    <p className="text-[11px] text-slate-400 line-clamp-1">
+                    <p className="text-[11px] text-slate-500 line-clamp-1">
                       {opp.primaryPainPoint}
                     </p>
                   </div>
 
-                  <div className="flex items-center space-x-4 shrink-0">
-                    <div className="text-right">
-                      <div className="flex items-center space-x-1.5 justify-end">
-                        <span className="text-[10px] text-slate-400 font-mono">OPP:</span>
-                        <span className="text-xs font-bold font-mono text-amber-400 bg-amber-950/60 px-1.5 py-0.5 rounded border border-amber-800/40">
-                          {opp.opportunityScore}/100
-                        </span>
+                  <div className="flex items-center space-x-4 shrink-0 sm:self-center self-end">
+                    <div className="flex items-center gap-2">
+                      <div className="px-2 py-1 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold">
+                        <span className="text-[10px] text-amber-500/70 font-normal mr-1">OPP</span>
+                        {opp.opportunityScore}
                       </div>
-                      <div className="flex items-center space-x-1.5 justify-end mt-1">
-                        <span className="text-[10px] text-slate-400 font-mono">CONF:</span>
-                        <span className="text-xs font-bold font-mono text-cyan-400 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-800/40">
-                          {opp.confidenceScore}/100
-                        </span>
+                      <div className="px-2 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-semibold">
+                        <span className="text-[10px] text-cyan-500/70 font-normal mr-1">CONF</span>
+                        {opp.confidenceScore}
                       </div>
                     </div>
 
                     <Link
                       href={`/leads/${opp.company.id}`}
-                      className="px-3 py-1.5 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white text-xs font-medium transition-colors"
+                      className="px-3.5 py-1.5 rounded-xl bg-white/[0.05] hover:bg-indigo-600 hover:text-white border border-white/[0.08] text-slate-300 text-xs font-medium transition-all flex items-center space-x-1"
                     >
-                      Action
+                      <span>Action</span>
+                      <ChevronRight className="w-3 h-3 text-slate-400 group-hover:text-white" />
                     </Link>
                   </div>
                 </div>
@@ -259,32 +293,36 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Live Activity Stream (1 Col) */}
+        {/* Live Audit Trail (1 Col) */}
         <div className="space-y-4">
           <div className="flex items-center space-x-2">
-            <Clock className="w-4 h-4 text-cyan-400" />
-            <h2 className="text-sm font-semibold text-white tracking-wide uppercase font-mono">
+            <div className="w-6 h-6 rounded-lg bg-cyan-500/10 flex items-center justify-center text-cyan-400">
+              <Clock className="w-3.5 h-3.5" />
+            </div>
+            <h2 className="text-sm font-semibold text-slate-200 tracking-tight">
               Live Audit Trail
             </h2>
           </div>
 
-          <div className="p-4 rounded-xl bg-card border border-border space-y-3">
-            {data?.recentActivity?.length === 0 ? (
-              <p className="text-xs text-slate-400 text-center py-4">No recent activity logged.</p>
+          <div className="glass-card p-4 rounded-2xl border border-white/[0.06]">
+            {loading ? (
+              <p className="text-xs text-slate-500 text-center py-4">Loading audit activity...</p>
+            ) : data?.recentActivity?.length === 0 ? (
+              <p className="text-xs text-slate-500 text-center py-6">No recent system activity logged.</p>
             ) : (
-              <div className="space-y-3">
+              <div className="space-y-3.5">
                 {data?.recentActivity?.map((act: any) => (
                   <div
                     key={act.id}
-                    className="flex items-start space-x-3 text-xs border-b border-border/50 pb-2.5 last:border-0 last:pb-0"
+                    className="flex items-start space-x-3 text-xs border-b border-white/[0.04] pb-3 last:border-0 last:pb-0"
                   >
-                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 shrink-0"></div>
-                    <div className="space-y-0.5 flex-1">
-                      <div className="flex items-center justify-between">
-                        <span className="font-mono font-medium text-slate-200">
+                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 mt-1.5 shrink-0 shadow-[0_0_6px_#818cf8]"></div>
+                    <div className="space-y-0.5 flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-slate-200 truncate">
                           {act.action.replace(/_/g, " ")}
                         </span>
-                        <span className="text-[10px] text-slate-400 font-mono">
+                        <span className="text-[10px] text-slate-500 shrink-0 font-mono">
                           {new Date(act.createdAt).toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
@@ -292,7 +330,7 @@ export default function DashboardPage() {
                         </span>
                       </div>
                       {act.company && (
-                        <p className="text-[11px] text-slate-400">{act.company.name}</p>
+                        <p className="text-[11px] text-slate-400 truncate">{act.company.name}</p>
                       )}
                     </div>
                   </div>

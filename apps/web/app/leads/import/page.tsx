@@ -12,6 +12,7 @@ import {
   Sparkles,
   RefreshCw,
   Layers,
+  FileText,
 } from "lucide-react";
 
 export default function LeadImportPage() {
@@ -131,25 +132,27 @@ export default function LeadImportPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="max-w-4xl mx-auto space-y-8 pb-16">
       {/* Header */}
-      <div>
-        <div className="flex items-center space-x-2">
-          <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-blue-950/80 border border-blue-800/60 text-blue-400">
-            IMPORT PIPELINE
+      <div className="border-b border-border/60 pb-6">
+        <div className="flex items-center space-x-2 mb-1.5">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+            <Upload className="w-3 h-3" />
+            Ingestion Pipeline
           </span>
-          <span className="text-xs text-slate-400">CSV / XLSX Ingestion</span>
+          <span className="text-xs text-slate-500">•</span>
+          <span className="text-xs text-slate-400">CSV & XLSX Supported</span>
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-white mt-1">
-          Lead Import & Deduplication Engine
+        <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+          Lead Import & Deduplication
         </h1>
-        <p className="text-sm text-slate-400 mt-0.5">
-          Upload spreadsheets, normalize domains/phones, preview duplicate collisions, and ingest into PostgreSQL.
+        <p className="text-xs sm:text-sm text-slate-400 mt-1 leading-relaxed">
+          Upload spreadsheets, normalize domains and phones, preview collisions in real-time, and batch-ingest cleanly into PostgreSQL.
         </p>
       </div>
 
       {error && (
-        <div className="p-4 rounded-xl bg-rose-950/40 border border-rose-800/50 text-rose-300 text-xs flex items-center space-x-2">
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center space-x-3">
           <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
           <span>{error}</span>
         </div>
@@ -157,24 +160,25 @@ export default function LeadImportPage() {
 
       {/* Step 1: Upload / Sample Box */}
       {!previewData && (
-        <div className="space-y-6">
-          <div className="border-2 border-dashed border-border hover:border-slate-600 rounded-2xl p-10 text-center space-y-4 bg-card/40 transition-colors">
-            <div className="w-12 h-12 rounded-xl bg-blue-600/20 border border-blue-500/40 text-blue-400 flex items-center justify-center mx-auto">
+        <div className="space-y-5">
+          <div className="border-2 border-dashed border-white/[0.08] hover:border-indigo-500/40 rounded-2xl p-10 text-center space-y-4 glass-card transition-all group">
+            <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center mx-auto group-hover:scale-105 transition-transform">
               <Upload className="w-6 h-6" />
             </div>
 
             <div>
               <p className="text-sm font-semibold text-white">
-                Drag and drop your lead spreadsheet here
+                Drag and drop your spreadsheet here, or browse
               </p>
-              <p className="text-xs text-slate-400 mt-1">
-                Supports .CSV and .XLSX format with columns for Company Name, Website, Phone, Email, Location.
+              <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                Supports .CSV and .XLSX files. Required headers: Company Name, Website, Phone, Email, Location.
               </p>
             </div>
 
-            <div className="flex items-center justify-center space-x-3 pt-2">
-              <label className="cursor-pointer px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-xs font-medium transition-colors">
-                <span>Select File</span>
+            <div className="pt-2">
+              <label className="cursor-pointer inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all shadow-md shadow-indigo-600/20 active:scale-95">
+                <FileText className="w-3.5 h-3.5" />
+                <span>Select File from Disk</span>
                 <input
                   type="file"
                   accept=".csv, .xlsx, .xls"
@@ -187,15 +191,17 @@ export default function LeadImportPage() {
           </div>
 
           {/* Preset Sample Option */}
-          <div className="p-5 rounded-xl bg-card border border-border flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <FileSpreadsheet className="w-5 h-5 text-amber-400" />
+          <div className="glass-panel p-5 rounded-2xl border border-white/[0.06] flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center space-x-3.5">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                <FileSpreadsheet className="w-4 h-4" />
+              </div>
               <div>
                 <h3 className="text-xs font-semibold text-white">
-                  Load Pre-Configured Dubai Business Sample
+                  Load Pre-Configured Dubai Business Dataset
                 </h3>
-                <p className="text-[11px] text-slate-400">
-                  8 verified high-intent Dubai & UAE companies across Interior Architecture, Clinics, Carpentry & Law.
+                <p className="text-xs text-slate-400 mt-0.5">
+                  8 verified high-intent UAE companies across Interior Architecture, Clinics, Carpentry & Law.
                 </p>
               </div>
             </div>
@@ -203,7 +209,7 @@ export default function LeadImportPage() {
             <button
               onClick={handleLoadSample}
               disabled={loading}
-              className="px-3.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 border border-slate-700 text-slate-200 text-xs font-medium transition-colors flex items-center space-x-2"
+              className="px-4 py-2 rounded-xl bg-white/[0.05] hover:bg-white/[0.08] border border-white/[0.08] text-slate-200 text-xs font-medium transition-all flex items-center space-x-2 self-start sm:self-auto shrink-0"
             >
               {loading ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -221,68 +227,68 @@ export default function LeadImportPage() {
         <div className="space-y-6">
           {/* Summary Pills */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <div className="p-3.5 rounded-xl bg-card border border-border">
-              <span className="text-[11px] text-slate-400">Total Rows</span>
-              <div className="text-xl font-bold font-mono text-white mt-0.5">
+            <div className="glass-card p-4 rounded-xl border border-white/[0.06]">
+              <span className="text-[11px] text-slate-400 font-medium">Total Rows</span>
+              <div className="text-2xl font-bold tracking-tight text-white mt-1">
                 {previewData.totalRows}
               </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-emerald-950/30 border border-emerald-800/40">
-              <span className="text-[11px] text-emerald-400">New Qualified Leads</span>
-              <div className="text-xl font-bold font-mono text-emerald-400 mt-0.5">
+            <div className="glass-card p-4 rounded-xl border border-emerald-500/20 bg-emerald-500/[0.03]">
+              <span className="text-[11px] text-emerald-400 font-medium">Qualified Leads</span>
+              <div className="text-2xl font-bold tracking-tight text-emerald-400 mt-1">
                 {previewData.newLeadsCount}
               </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-800/40">
-              <span className="text-[11px] text-amber-400">Duplicate Collisions</span>
-              <div className="text-xl font-bold font-mono text-amber-400 mt-0.5">
+            <div className="glass-card p-4 rounded-xl border border-amber-500/20 bg-amber-500/[0.03]">
+              <span className="text-[11px] text-amber-400 font-medium">Duplicate Collisions</span>
+              <div className="text-2xl font-bold tracking-tight text-amber-400 mt-1">
                 {previewData.duplicateLeadsCount}
               </div>
             </div>
-            <div className="p-3.5 rounded-xl bg-rose-950/30 border border-rose-800/40">
-              <span className="text-[11px] text-rose-400">Invalid Rows</span>
-              <div className="text-xl font-bold font-mono text-rose-400 mt-0.5">
+            <div className="glass-card p-4 rounded-xl border border-rose-500/20 bg-rose-500/[0.03]">
+              <span className="text-[11px] text-rose-400 font-medium">Invalid Rows</span>
+              <div className="text-2xl font-bold tracking-tight text-rose-400 mt-1">
                 {previewData.invalidRows}
               </div>
             </div>
           </div>
 
           {/* Preview Table */}
-          <div className="rounded-xl border border-border bg-card overflow-hidden">
-            <div className="px-4 py-3 border-b border-border bg-[#0c0e14] flex items-center justify-between text-xs font-semibold text-slate-300">
+          <div className="glass-panel rounded-2xl border border-white/[0.06] overflow-hidden">
+            <div className="px-5 py-3 border-b border-white/[0.04] bg-white/[0.01] flex items-center justify-between text-xs font-medium text-slate-300">
               <span>Parsed Lead Breakdown</span>
-              <span className="font-mono text-[11px] text-slate-400">
-                Multi-Key Deduplication Active
+              <span className="text-[11px] text-slate-500">
+                Multi-Key Normalization Active
               </span>
             </div>
 
-            <div className="divide-y divide-border/60 max-h-96 overflow-y-auto">
+            <div className="divide-y divide-white/[0.04] max-h-96 overflow-y-auto">
               {previewData.items.map((item: any) => (
                 <div
                   key={item.rowNumber}
-                  className="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
+                  className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs"
                 >
-                  <div className="space-y-1">
+                  <div className="space-y-1.5 flex-1 min-w-0">
                     <div className="flex items-center space-x-2">
                       <span className="font-semibold text-white">
                         {item.input.companyName}
                       </span>
                       {item.input.industry && (
-                        <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/[0.04] text-slate-400 border border-white/[0.06]">
                           {item.input.industry}
                         </span>
                       )}
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-400">
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
                       {item.input.contactName && (
                         <span>Contact: {item.input.contactName}</span>
                       )}
                       {item.input.website && (
-                        <span>Web: {item.input.website}</span>
+                        <span className="font-mono text-[11px] text-slate-400">Web: {item.input.website}</span>
                       )}
                       {item.input.phone && (
-                        <span>Phone: {item.input.phone}</span>
+                        <span className="font-mono text-[11px] text-slate-400">Phone: {item.input.phone}</span>
                       )}
                       {item.input.city && (
                         <span>City: {item.input.city}</span>
@@ -290,19 +296,19 @@ export default function LeadImportPage() {
                     </div>
                   </div>
 
-                  <div className="shrink-0">
+                  <div className="shrink-0 self-end sm:self-center">
                     {item.isDuplicate ? (
-                      <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-amber-950/80 border border-amber-800/60 text-amber-300">
+                      <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-500/10 border border-amber-500/20 text-amber-400">
                         <AlertTriangle className="w-3 h-3" />
                         <span>Duplicate ({item.duplicateReason})</span>
                       </span>
                     ) : item.isValid ? (
-                      <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-emerald-950/80 border border-emerald-800/60 text-emerald-300">
+                      <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
                         <CheckCircle2 className="w-3 h-3" />
                         <span>Ready to Ingest</span>
                       </span>
                     ) : (
-                      <span className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium bg-rose-950/80 border border-rose-800/60 text-rose-300">
+                      <span className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-medium bg-rose-500/10 border border-rose-500/20 text-rose-400">
                         <XCircle className="w-3 h-3" />
                         <span>Invalid</span>
                       </span>
@@ -320,7 +326,7 @@ export default function LeadImportPage() {
                 setPreviewData(null);
                 setFile(null);
               }}
-              className="px-4 py-2 rounded-lg border border-border text-slate-400 hover:text-white text-xs font-medium"
+              className="px-4 py-2.5 rounded-xl border border-white/[0.08] bg-white/[0.02] hover:bg-white/[0.06] text-slate-400 hover:text-white text-xs font-medium transition-all"
             >
               Cancel & Upload Another
             </button>
@@ -328,7 +334,7 @@ export default function LeadImportPage() {
             <button
               onClick={handleCommitImport}
               disabled={importing || previewData.newLeadsCount === 0}
-              className="px-5 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-xs font-semibold flex items-center space-x-2 transition-colors shadow-lg shadow-blue-900/30"
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium flex items-center space-x-2 transition-all shadow-md shadow-indigo-600/20 active:scale-95"
             >
               {importing ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />

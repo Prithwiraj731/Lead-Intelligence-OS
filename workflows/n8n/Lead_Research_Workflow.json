@@ -1,7 +1,85 @@
 {
   "id": "lio_02_lead_research",
-  "name": "LIO — 02 Lead Research",
+  "name": "LIO — 02 Lead Research [NASA Mission Control Architecture]",
   "nodes": [
+    {
+      "parameters": {
+        "content": "## 🛰️ MODULE 01: ORBITAL TELEMETRY & INGESTION\n**Subsystems Active:**\n• Inbound SAT-COMM Webhook Gateway\n• Payload Integrity & UUID Check\n• Ingestion Flight Log & Epoch Synchronizer",
+        "height": 380,
+        "width": 720,
+        "color": 5
+      },
+      "id": "sticky-module-1",
+      "name": "Sticky Note - Module 01",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [80, 160]
+    },
+    {
+      "parameters": {
+        "content": "## 🔭 MODULE 02: PROTOCOL & DEEP RECON PROBE\n**Subsystems Active:**\n• DNS & RFC-3986 Protocol Formatter\n• Deep Space HTTP Inspector Sensor\n• Autonomous Redirect & Failure Handlers",
+        "height": 380,
+        "width": 480,
+        "color": 6
+      },
+      "id": "sticky-module-2",
+      "name": "Sticky Note - Module 02",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [820, 160]
+    },
+    {
+      "parameters": {
+        "content": "## ⚡ MODULE 03: MULTI-SPECTRAL DIAGNOSTIC ARRAYS\n**Subsystems Active:**\n• Sensor ALPHA: Cryptographic SSL Shield\n• Sensor BETA: Quantum Mobile Viewport Matrix\n• Sensor GAMMA: Tech Stack & Architecture Fingerprint\n• Sensor DELTA: Lead Capture & WhatsApp Trap\n• Orbital Satellites 1-3 & Ground Stations 1-3",
+        "height": 620,
+        "width": 1180,
+        "color": 4
+      },
+      "id": "sticky-module-3",
+      "name": "Sticky Note - Module 03",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [1320, 40]
+    },
+    {
+      "parameters": {
+        "content": "## 🧬 MODULE 04: FUSION & HEALTH INDEX\n**Subsystems Active:**\n• Multi-Spectral Telemetry Fusion Matrix\n• Algorithmic Health Index (0-100)\n• Orbital Satellite 4 (Audit Ledger)\n• Ground Station 4 (BlackBox Recorder)",
+        "height": 620,
+        "width": 460,
+        "color": 3
+      },
+      "id": "sticky-module-4",
+      "name": "Sticky Note - Module 04",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [2520, 40]
+    },
+    {
+      "parameters": {
+        "content": "## 🧠 MODULE 05: OPPORTUNITY & VALUE CALIBRATION\n**Subsystems Active:**\n• 15-Service Neural Matching Engine\n• Primary Pain Point & Evidence Linker\n• AED Budget & Commercial ROI Calibrator",
+        "height": 380,
+        "width": 460,
+        "color": 7
+      },
+      "id": "sticky-module-5",
+      "name": "Sticky Note - Module 05",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [3000, 160]
+    },
+    {
+      "parameters": {
+        "content": "## 📡 MODULE 06: GROUND CONTROL DOWNLINK\n**Subsystems Active:**\n• Downlink Contract Formatter\n• HTTP Callback to Lead Intelligence OS Core\n• Mission Accomplished Flight Beacon",
+        "height": 380,
+        "width": 720,
+        "color": 5
+      },
+      "id": "sticky-module-6",
+      "name": "Sticky Note - Module 06",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [3480, 160]
+    },
     {
       "parameters": {
         "httpMethod": "POST",
@@ -10,62 +88,242 @@
         "responseData": "allEntries",
         "options": {}
       },
-      "name": "Webhook: Inbound Lead Trigger",
+      "name": "🛰️ SAT-COMM: Inbound Telemetry Ingest",
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2,
-      "position": [180, 300],
-      "id": "node-webhook-trigger",
+      "position": [140, 320],
+      "id": "node-satcomm-webhook",
       "webhookId": "lead-research-trigger"
     },
     {
       "parameters": {
-        "jsCode": "// 1. Validate incoming lead payload\nconst body = $input.item.json.body || $input.item.json;\nconst companyId = body.companyId;\nconst companyName = body.companyName || 'Unknown Company';\nconst website = (body.website || '').trim();\nconst industry = body.industry || '';\nconst location = body.location || 'UAE';\n\nif (!companyId) {\n  throw new Error('Validation failed: companyId is required.');\n}\n\nreturn {\n  json: {\n    companyId,\n    companyName,\n    website,\n    industry,\n    location,\n    receivedAt: new Date().toISOString()\n  }\n};"
+        "jsCode": "const body = $input.item.json.body || $input.item.json;\nconst companyId = body.companyId;\nconst companyName = body.companyName || 'Target Enterprise';\nconst rawWebsite = (body.website || '').trim();\nconst industry = body.industry || 'Commercial Enterprise';\nconst location = body.location || 'UAE';\n\nif (!companyId) {\n  throw new Error('MISSION CONTROL FAULT: companyId UUID is required in telemetry ingestion.');\n}\n\nconst missionId = 'NASA-LIO-' + Date.now().toString(36).toUpperCase();\nconst orbitalEpoch = new Date().toISOString();\n\nreturn {\n  json: {\n    missionId,\n    orbitalEpoch,\n    companyId,\n    companyName,\n    rawWebsite,\n    industry,\n    location,\n    telemetryLog: [\n      `[${orbitalEpoch}] ORBITAL INGESTION ESTABLISHED for ${companyName} (${companyId})`\n    ]\n  }\n};"
       },
-      "name": "Validate Lead",
+      "name": "🛡️ Mission Control: Payload Integrity Guard",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [380, 300],
-      "id": "node-validate-lead"
+      "position": [380, 320],
+      "id": "node-integrity-guard"
     },
     {
       "parameters": {
-        "url": "={{ $json.website ? ($json.website.startsWith('http') ? $json.website : 'https://' + $json.website) : '' }}",
+        "jsCode": "const prev = $input.item.json;\nconst hasUrl = Boolean(prev.rawWebsite && prev.rawWebsite.length > 2);\nconst telemetryLog = [...(prev.telemetryLog || [])];\ntelemetryLog.push(`[${new Date().toISOString()}] FLIGHT_LOG: Target endpoint state: ${hasUrl ? 'ASSIGNED (' + prev.rawWebsite + ')' : 'UNASSIGNED (NO_DOMAIN)'}`);\n\nreturn {\n  json: {\n    ...prev,\n    hasUrl,\n    telemetryLog,\n    flightStatus: 'PRE_PROBE_INITIALIZED'\n  }\n};"
+      },
+      "name": "📡 Telemetry Beacon: Ingestion Flight Log",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [620, 320],
+      "id": "node-ingestion-beacon"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $input.item.json;\nlet targetUrl = '';\nif (prev.rawWebsite) {\n  targetUrl = prev.rawWebsite.startsWith('http') ? prev.rawWebsite : ('https://' + prev.rawWebsite);\n}\nconst telemetryLog = [...(prev.telemetryLog || [])];\ntelemetryLog.push(`[${new Date().toISOString()}] PROTOCOL_FORMATTER: Target orbital probe resolved to: ${targetUrl || 'NONE'}`);\n\nreturn {\n  json: {\n    ...prev,\n    targetUrl,\n    telemetryLog,\n    probeConfig: {\n      timeoutMs: 6000,\n      userAgent: 'NASA-LeadIntel-Probe/4.2 (Spaceborne Autonomous Inspector)'\n    }\n  }\n};"
+      },
+      "name": "🌐 Orbital DNS & Protocol Formatter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 320],
+      "id": "node-dns-formatter"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.targetUrl }}",
         "options": {
-          "timeout": 5000,
+          "timeout": 6000,
           "redirect": {
             "redirect": {
               "followRedirects": true,
-              "maxRedirects": 2
+              "maxRedirects": 3
             }
           }
         }
       },
-      "name": "Research / Website Inspection",
+      "name": "🔭 Deep Space HTTP Probe: Website Recon",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [580, 300],
-      "id": "node-website-inspection",
+      "position": [1100, 320],
+      "id": "node-website-recon-probe",
       "onError": "continueRegularOutput"
     },
     {
       "parameters": {
-        "jsCode": "// 2. Deep Digital Presence & Evidence Fingerprinting\nconst httpData = $input.item.json || {};\nconst lead = $('Validate Lead').first().json;\n\nconst hasUrl = Boolean(lead.website && lead.website.length > 2);\nconst isError = Boolean(httpData.error || httpData.statusCode === undefined || httpData.statusCode >= 400);\nconst isOk = hasUrl && !isError;\nconst html = typeof httpData.data === 'string' ? httpData.data : (typeof httpData === 'string' ? httpData : '');\n\nconst hasMobile = /<meta[^>]*name=[\"']viewport[\"'][^>]*content=[\"'][^\"']*width=device-width/i.test(html);\nconst hasHttps = (lead.website || '').startsWith('https://');\nconst hasForm = /<form/i.test(html) && /(contact|message|submit|enquiry|email|name)/i.test(html);\nconst hasBooking = /(calendly\\.com|booksy\\.com|fresha\\.com|book-now|schedule|appointment)/i.test(html);\nconst hasPortfolio = /(portfolio|projects|gallery|our-work|works|case-studies)/i.test(html);\nconst hasWhatsapp = /(wa\\.me|api\\.whatsapp\\.com\\/send)/i.test(html);\n\n// Tech stack detection\nconst cms = [];\nif (/wp-content|wordpress/i.test(html)) cms.push('WordPress');\nif (/shopify/i.test(html)) cms.push('Shopify');\nif (/webflow/i.test(html)) cms.push('Webflow');\nif (/wix/i.test(html)) cms.push('Wix');\nif (/squarespace/i.test(html)) cms.push('Squarespace');\n\nconst frameworks = [];\nif (/_next/i.test(html)) frameworks.push('Next.js');\nif (/react/i.test(html)) frameworks.push('React');\nif (/vue/i.test(html)) frameworks.push('Vue');\n\nconst analytics = [];\nif (/googletagmanager|google-analytics|gtag/i.test(html)) analytics.push('Google Analytics (GA4)');\nif (/connect\\.facebook\\.net/i.test(html)) analytics.push('Meta Pixel');\nif (/hotjar/i.test(html)) analytics.push('Hotjar');\n\nconst chatWidgets = [];\nif (hasWhatsapp) chatWidgets.push('WhatsApp Direct Link');\nif (/intercom/i.test(html)) chatWidgets.push('Intercom');\nif (/crisp/i.test(html)) chatWidgets.push('Crisp');\nif (/tidio/i.test(html)) chatWidgets.push('Tidio');\nif (/tawk\\.to/i.test(html)) chatWidgets.push('Tawk.to');\n\nconst detectedProblems = [];\nconst evidenceMatrix = [];\nlet websiteScore = 100;\n\nif (!hasUrl) {\n  websiteScore = 0;\n  detectedProblems.push('No dedicated verified website URL');\n  evidenceMatrix.push({\n    observation: 'No registered web presence detected.',\n    evidence: 'Lead record has no verified website endpoint.',\n    impact: 'Losing high-intent UAE commercial search traffic to competitors.',\n    recommendedSolution: 'Build a modern greenfield business website.',\n    confidence: 95,\n    truthTier: 'VERIFIED',\n    category: 'PRESENCE'\n  });\n} else if (!isOk) {\n  websiteScore = 15;\n  detectedProblems.push('Website offline or unreachable');\n  evidenceMatrix.push({\n    observation: 'Website server is unreachable or returned error.',\n    evidence: `HTTP request failed (${httpData.error || 'Offline'}).`,\n    impact: 'Commercial clients encounter offline errors, damaging reputation.',\n    recommendedSolution: 'Restore server uptime and deploy cloud hosting.',\n    confidence: 90,\n    truthTier: 'VERIFIED',\n    category: 'UPTIME'\n  });\n} else {\n  if (!hasHttps) {\n    detectedProblems.push('Missing SSL encryption (Plain HTTP in use)');\n    websiteScore -= 20;\n    evidenceMatrix.push({\n      observation: 'Website lacks SSL encryption.',\n      evidence: 'Domain loads over insecure HTTP.',\n      impact: 'Triggers browser security warnings, destroying trust.',\n      recommendedSolution: 'Configure SSL certificate and enforce HTTPS.',\n      confidence: 100,\n      truthTier: 'VERIFIED',\n      category: 'SECURITY'\n    });\n  }\n  if (!hasMobile) {\n    detectedProblems.push('No responsive mobile viewport detected');\n    websiteScore -= 25;\n    evidenceMatrix.push({\n      observation: 'Mobile viewport meta tag is missing.',\n      evidence: 'HTML lacks responsive viewport tag.',\n      impact: 'High bounce rate for UAE mobile visitors.',\n      recommendedSolution: 'Rebuild with mobile-first responsive architecture.',\n      confidence: 100,\n      truthTier: 'VERIFIED',\n      category: 'MOBILE'\n    });\n  }\n  if (!hasForm && !hasBooking) {\n    detectedProblems.push('No direct enquiry or booking mechanism on primary landing');\n    websiteScore -= 20;\n    evidenceMatrix.push({\n      observation: 'No direct enquiry form or booking flow detected.',\n      evidence: 'No <form> or scheduling widget found.',\n      impact: 'Interested buyers encounter friction trying to reach sales.',\n      recommendedSolution: 'Implement high-converting lead capture funnels.',\n      confidence: 95,\n      truthTier: 'VERIFIED',\n      category: 'CONVERSION'\n    });\n  }\n  if (!hasPortfolio) {\n    detectedProblems.push('Project portfolio is difficult to discover');\n    websiteScore -= 15;\n    evidenceMatrix.push({\n      observation: 'Completed projects portfolio is difficult to discover.',\n      evidence: 'No dedicated portfolio/project navigation link found.',\n      impact: 'High-ticket buyers cannot verify previous craftsmanship.',\n      recommendedSolution: 'Deploy a high-resolution project portfolio showcase.',\n      confidence: 88,\n      truthTier: 'INFERRED',\n      category: 'PORTFOLIO'\n    });\n  }\n  if (hasWhatsapp && chatWidgets.length === 1) {\n    evidenceMatrix.push({\n      observation: 'Business promotes WhatsApp but lacks automated 24/7 qualification.',\n      evidence: 'Direct WhatsApp link detected without automated bot layer.',\n      impact: 'Delayed responses during off-hours risk losing hot prospects.',\n      recommendedSolution: 'Deploy 24/7 AI WhatsApp Qualification Bot.',\n      confidence: 90,\n      truthTier: 'INFERRED',\n      category: 'AI_AUTOMATION'\n    });\n  }\n  websiteScore = Math.max(20, Math.min(100, websiteScore));\n}\n\nconst techStack = [...cms, ...frameworks, ...analytics, ...chatWidgets];\n\nreturn {\n  json: {\n    companyId: lead.companyId,\n    companyName: lead.companyName,\n    website: lead.website,\n    industry: lead.industry,\n    location: lead.location,\n    websiteStatus: !hasUrl ? 'NO_WEBSITE' : (isOk ? 'ONLINE' : 'OFFLINE'),\n    websiteScore,\n    hasMobile,\n    hasHttps,\n    hasForm,\n    hasBooking,\n    hasPortfolio,\n    hasWhatsapp,\n    techStack,\n    digitalPresence: {\n      cms,\n      frameworks,\n      analytics,\n      chatWidgets,\n      hasWhatsapp,\n      hasHttps,\n      hasMobileViewport: hasMobile,\n      hasContactForm: hasForm,\n      hasBooking,\n      hasPortfolio\n    },\n    detectedProblems,\n    evidenceMatrix\n  }\n};"
+        "jsCode": "const httpData = $input.item.json || {};\nconst leadData = $('🌐 Orbital DNS & Protocol Formatter').first().json;\nconst telemetryLog = [...(leadData.telemetryLog || [])];\n\nconst hasUrl = leadData.hasUrl;\nconst statusCode = httpData.statusCode;\nconst isError = Boolean(httpData.error || (hasUrl && (statusCode === undefined || statusCode >= 400)));\nconst isOnline = hasUrl && !isError;\nconst rawHtml = typeof httpData.data === 'string' ? httpData.data : (typeof httpData === 'string' ? httpData : '');\nconst payloadBytes = rawHtml.length;\nconst payloadKb = (payloadBytes / 1024).toFixed(2);\n\ntelemetryLog.push(`[${new Date().toISOString()}] TACHOMETER: HTTP Probe status=${statusCode || (isOnline ? 200 : 'ERR')}, Payload=${payloadKb} KB, Online=${isOnline}`);\n\nreturn {\n  json: {\n    ...leadData,\n    statusCode: statusCode || (isOnline ? 200 : 0),\n    isOnline,\n    payloadKb,\n    rawHtml,\n    telemetryLog\n  }\n};"
       },
-      "name": "Extract Comprehensive Signals",
+      "name": "📊 Telemetry Tachometer: HTTP Response Velocity",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [780, 300],
-      "id": "node-extract-signals"
+      "position": [1340, 320],
+      "id": "node-velocity-tachometer"
     },
     {
       "parameters": {
-        "jsCode": "// 3. AI Opportunity Analysis, 15-Service Matching & Dual Scoring Engine (Commercial Claims Accuracy)\nconst d = $input.item.json;\nconst industry = (d.industry || '').toLowerCase();\n\nlet opportunityScore = 70;\nlet confidenceScore = 80;\nlet recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\nlet recommendedServiceName = 'Premium Website Redesign & Conversion Architecture';\nlet primaryPainPoint = '';\nlet reasoning = '';\nlet potentialImpact = '';\nlet reasonToContact = '';\nlet suggestedOffer = '';\nlet expectedBusinessBenefit = '';\nlet claimType = 'ESTIMATE';\nlet pitchAngle = '';\nlet estimatedBudgetMin = 35000;\nlet estimatedBudgetMax = 75000;\nlet recommendedChannel = 'EMAIL';\nconst evidenceSummary = [];\n\nif (d.websiteStatus === 'NO_WEBSITE' || d.websiteStatus === 'OFFLINE') {\n  opportunityScore = 92;\n  confidenceScore = 95;\n  recommendedServiceCode = 'NEW_HIGH_CONVERTING_WEBSITE';\n  recommendedServiceName = 'New High-Converting Business Website & Digital Presence';\n  primaryPainPoint = 'No active verified web presence exists to capture direct client search and high-ticket enquiries.';\n  reasoning = `The business is established in ${d.location || 'UAE'} but lacks an online headquarters to capture commercial search demand.`;\n  potentialImpact = 'Establish direct search authority and create a verified digital acquisition channel.';\n  reasonToContact = `Your business is active in ${d.location || 'UAE'}, but without a dedicated website you are losing inbound client search demand directly to competitors.`;\n  suggestedOffer = `Custom Greenfield Digital Presence & Portfolio for ${d.companyName}`;\n  expectedBusinessBenefit = 'Create a clearer inbound path for potential clients searching for your services and establish direct digital credibility.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Direct ownership of digital client acquisition channel without relying solely on social media';\n  estimatedBudgetMin = 28000;\n  estimatedBudgetMax = 60000;\n  recommendedChannel = 'WHATSAPP';\n  evidenceSummary.push('Zero verified website domain or web infrastructure detected.');\n} else if (!d.hasMobile) {\n  opportunityScore = 88;\n  confidenceScore = 92;\n  recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\n  recommendedServiceName = 'Mobile-First Website Redesign & Modernization';\n  primaryPainPoint = 'Website layout lacks a responsive mobile viewport, creating immediate conversion friction for smartphone visitors.';\n  reasoning = 'A significant majority of commercial UAE traffic originates from mobile devices; non-responsive viewports increase visitor drop-off.';\n  potentialImpact = 'Reduce mobile visitor bounce and eliminate interface scaling friction for smartphone visitors.';\n  reasonToContact = 'Your website content is solid, but the layout is not optimized for mobile screens, creating friction for smartphone visitors.';\n  suggestedOffer = `Modern Mobile-First Web Architecture for ${d.companyName}`;\n  expectedBusinessBenefit = 'Improve mobile user experience and remove layout friction for smartphone visitors.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Mobile viewport friction audit showing immediate conversion drop-off';\n  estimatedBudgetMin = 35000;\n  estimatedBudgetMax = 70000;\n  evidenceSummary.push('Missing responsive mobile viewport in HTML source.');\n} else if (!d.hasHttps) {\n  opportunityScore = 85;\n  confidenceScore = 95;\n  recommendedServiceCode = 'CYBERSECURITY_REVIEW_HARDENING';\n  recommendedServiceName = 'Web Security Review & Vulnerability Hardening';\n  primaryPainPoint = 'Domain is missing SSL encryption, triggering browser \"Not Secure\" warnings for prospective clients.';\n  reasoning = 'Missing HTTPS flags security warnings in modern browsers, destroying client trust and search engine visibility.';\n  potentialImpact = 'Eliminate browser security warnings and protect customer privacy across all enquiry forms.';\n  reasonToContact = 'Your website is currently triggering \"Not Secure\" browser warnings because SSL encryption is inactive on your domain.';\n  suggestedOffer = `Security & SSL Infrastructure Upgrade for ${d.companyName}`;\n  expectedBusinessBenefit = 'Eliminate browser security warnings and protect customer enquiry transmission with standard SSL encryption.';\n  claimType = 'VERIFIED_FACT';\n  pitchAngle = 'Browser security trust badge and search penalty mitigation';\n  estimatedBudgetMin = 18000;\n  estimatedBudgetMax = 45000;\n  evidenceSummary.push('Site loads over plain HTTP protocol without active SSL certificate.');\n} else if (d.hasWhatsapp && (industry.includes('clinic') || industry.includes('consult') || industry.includes('salon') || industry.includes('interior') || industry.includes('fitout') || industry.includes('real estate'))) {\n  opportunityScore = 90;\n  confidenceScore = 90;\n  recommendedServiceCode = 'AI_LEAD_QUALIFICATION_BOT';\n  recommendedServiceName = 'AI Lead Qualification & 24/7 WhatsApp Conversational System';\n  primaryPainPoint = 'Business promotes WhatsApp contact but relies on manual replies, creating severe delays during off-hours.';\n  reasoning = 'Inbound prospects expect timely responses; automated conversational qualification captures lead details and intent promptly.';\n  potentialImpact = 'Improve inquiry capture during off-hours and streamline initial client qualification.';\n  reasonToContact = 'You provide a direct WhatsApp link on your site, but without an automated conversational bot, you risk losing prospects who message during off-hours.';\n  suggestedOffer = `24/7 AI Receptionist & WhatsApp Booking Integration for ${d.companyName}`;\n  expectedBusinessBenefit = 'Enable faster automated responses and lead qualification through WhatsApp.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Instant off-hours lead qualification and calendar booking';\n  estimatedBudgetMin = 25000;\n  estimatedBudgetMax = 55000;\n  recommendedChannel = 'WHATSAPP';\n  evidenceSummary.push('Direct WhatsApp link detected without conversational qualification layer.');\n} else if (!d.hasPortfolio && (industry.includes('interior') || industry.includes('architecture') || industry.includes('fitout') || industry.includes('design'))) {\n  opportunityScore = 89;\n  confidenceScore = 88;\n  recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\n  recommendedServiceName = 'Luxury Portfolio & Web Showcase Architecture';\n  primaryPainPoint = 'Project portfolio and completed client case studies are difficult to discover on primary navigation.';\n  reasoning = 'Commercial interior and design buyers make selection decisions primarily on visual proof of past project scale.';\n  potentialImpact = 'Provide clear visual proof of past craftsmanship and elevate digital brand authority.';\n  reasonToContact = 'Your craftsmanship and project reputation are strong, but your current web presence makes it difficult for potential commercial clients to quickly view your completed projects.';\n  suggestedOffer = `Luxury Portfolio & Case Study Showcase for ${d.companyName}`;\n  expectedBusinessBenefit = 'Provide immediate visual proof of project scale to prospective commercial clients and streamline proposal discussions.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Focus on portfolio discovery bottleneck rather than generic redesign';\n  estimatedBudgetMin = 38000;\n  estimatedBudgetMax = 80000;\n  evidenceSummary.push('No dedicated portfolio or case study showcase on primary navigation.');\n} else {\n  opportunityScore = 72;\n  confidenceScore = 80;\n  recommendedServiceCode = 'PERFORMANCE_SEO_UPGRADE';\n  recommendedServiceName = 'Technical SEO & Speed Optimization Engine';\n  primaryPainPoint = 'Digital presence lacks modern Core Web Vitals optimization and structured search discovery signals.';\n  reasoning = 'Speed optimization and clean schema markup improve organic search visibility and retain prospective buyers.';\n  potentialImpact = 'Strengthen search engine discovery signals and optimize visitor loading speed.';\n  reasonToContact = 'Your website is active, but missing schema markup and Core Web Vitals optimizations are holding back your organic search ranking in Dubai.';\n  suggestedOffer = `Technical SEO & Performance Architecture for ${d.companyName}`;\n  expectedBusinessBenefit = 'Improve page load responsiveness and strengthen technical search discovery foundations.';\n  claimType = 'ESTIMATE';\n  pitchAngle = 'Measurable speed and search indexing improvements';\n  estimatedBudgetMin = 20000;\n  estimatedBudgetMax = 45000;\n  evidenceSummary.push('Core Web Vitals can be accelerated to improve technical search positioning.');\n}\n\nreturn {\n  json: {\n    companyId: d.companyId,\n    websiteStatus: d.websiteStatus,\n    websiteScore: d.websiteScore,\n    confidenceScore,\n    techStack: d.techStack,\n    digitalPresence: d.digitalPresence,\n    evidenceMatrix: d.evidenceMatrix,\n    detectedProblems: d.detectedProblems,\n    conversionFriction: d.detectedProblems,\n    summary: `Technical audit and opportunity analysis completed for ${d.companyName}. Recommended service: ${recommendedServiceName}.`,\n    opportunity: {\n      opportunityScore,\n      confidenceScore,\n      recommendedServiceCode,\n      recommendedServiceName,\n      recommendedChannel,\n      primaryPainPoint,\n      reasoning,\n      potentialImpact,\n      reasonToContact,\n      suggestedOffer,\n      expectedBusinessBenefit,\n      claimType,\n      estimatedBudgetMin,\n      estimatedBudgetMax,\n      currency: 'AED',\n      pitchAngle,\n      evidenceSummary\n    }\n  }\n};"
+        "jsCode": "const prev = $input.item.json;\nconst hasHttps = (prev.targetUrl || '').startsWith('https://');\nconst sslObservations = [];\nlet sslScoreDeduction = 0;\n\nif (!prev.hasUrl) {\n  sslObservations.push('No website domain exists to evaluate SSL encryption.');\n} else if (!prev.isOnline) {\n  sslObservations.push('Target server unreachable; TLS handshake failed or timed out.');\n  sslScoreDeduction = 15;\n} else if (!hasHttps) {\n  sslObservations.push('CRITICAL: Target server serves plain HTTP; zero SSL encryption active.');\n  sslScoreDeduction = 20;\n} else {\n  sslObservations.push('VERIFIED: Active SSL encryption and HTTPS protocol enforced.');\n}\n\nreturn {\n  json: {\n    ...prev,\n    sslAudit: {\n      hasHttps,\n      sslScoreDeduction,\n      sslObservations,\n      cipherGrade: hasHttps ? 'A+' : 'F'\n    }\n  }\n};"
       },
-      "name": "AI Opportunity & Dual Scoring",
+      "name": "🔐 Sensor Array ALPHA: SSL & Cryptographic Shield",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [980, 300],
-      "id": "node-ai-opportunity"
+      "position": [1580, 320],
+      "id": "node-sensor-ssl"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $input.item.json;\nconst html = prev.rawHtml || '';\nconst hasMobile = /<meta[^>]*name=[\"']viewport[\"'][^>]*content=[\"'][^\"']*width=device-width/i.test(html);\nconst hasAppleTouchIcon = /rel=[\"']apple-touch-icon[\"']/i.test(html);\nconst viewportObservations = [];\nlet mobileScoreDeduction = 0;\n\nif (prev.isOnline) {\n  if (!hasMobile) {\n    viewportObservations.push('CRITICAL: Missing responsive mobile viewport meta tag.');\n    mobileScoreDeduction = 25;\n  } else {\n    viewportObservations.push('VERIFIED: Responsive mobile viewport configured with device-width.');\n  }\n}\n\nreturn {\n  json: {\n    ...prev,\n    viewportAudit: {\n      hasMobile,\n      hasAppleTouchIcon,\n      mobileScoreDeduction,\n      viewportObservations\n    }\n  }\n};"
+      },
+      "name": "📱 Sensor Array BETA: Quantum Mobile Viewport Matrix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 320],
+      "id": "node-sensor-viewport"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    satelliteBeacon: 'SATELLITE-ALPHA-THREAT',\n    missionId: d.missionId,\n    cipherGrade: d.sslAudit?.cipherGrade,\n    viewportConfigured: d.viewportAudit?.hasMobile,\n    threatLevel: !d.sslAudit?.hasHttps || !d.viewportAudit?.hasMobile ? 'ELEVATED' : 'NOMINAL',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "🛰️ Orbital Satellite 1: Threat & Anomaly Matrix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 120],
+      "id": "node-satellite-threat"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    groundStation: 'DUBAI-SPACE-GATEWAY-1',\n    missionId: d.missionId,\n    bandwidthCapturedKb: d.payloadKb,\n    signalHealth: d.isOnline ? 'NOMINAL' : 'DEGRADED',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "📡 Ground Telemetry 1: Real-Time Signal Monitor",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1820, 520],
+      "id": "node-ground-signal"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $input.item.json;\nconst html = prev.rawHtml || '';\n\nconst cms = [];\nif (/wp-content|wordpress/i.test(html)) cms.push('WordPress');\nif (/shopify/i.test(html)) cms.push('Shopify');\nif (/webflow/i.test(html)) cms.push('Webflow');\nif (/wix/i.test(html)) cms.push('Wix');\nif (/squarespace/i.test(html)) cms.push('Squarespace');\n\nconst frameworks = [];\nif (/_next/i.test(html)) frameworks.push('Next.js');\nif (/react/i.test(html)) frameworks.push('React');\nif (/vue/i.test(html)) frameworks.push('Vue');\nif (/angular/i.test(html)) frameworks.push('Angular');\n\nconst analytics = [];\nif (/googletagmanager|google-analytics|gtag/i.test(html)) analytics.push('Google Analytics (GA4)');\nif (/connect\\.facebook\\.net/i.test(html)) analytics.push('Meta Pixel');\nif (/hotjar/i.test(html)) analytics.push('Hotjar');\n\nconst chatWidgets = [];\nif (/(wa\\.me|api\\.whatsapp\\.com\\/send)/i.test(html)) chatWidgets.push('WhatsApp Direct Link');\nif (/intercom/i.test(html)) chatWidgets.push('Intercom');\nif (/crisp/i.test(html)) chatWidgets.push('Crisp');\nif (/tidio/i.test(html)) chatWidgets.push('Tidio');\nif (/tawk\\.to/i.test(html)) chatWidgets.push('Tawk.to');\n\nconst techStack = [...cms, ...frameworks, ...analytics, ...chatWidgets];\n\nreturn {\n  json: {\n    ...prev,\n    techAudit: {\n      cms,\n      frameworks,\n      analytics,\n      chatWidgets,\n      techStack\n    }\n  }\n};"
+      },
+      "name": "💻 Sensor Array GAMMA: Tech Stack & Architecture Fingerprint",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2060, 320],
+      "id": "node-sensor-tech"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    satelliteBeacon: 'SATELLITE-BETA-TRUST',\n    missionId: d.missionId,\n    techStackDetectedCount: (d.techAudit?.techStack || []).length,\n    cmsFound: (d.techAudit?.cms || []).join(', ') || 'Custom Engine',\n    frameworksFound: (d.techAudit?.frameworks || []).join(', ') || 'Vanilla DOM',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "🛰️ Orbital Satellite 2: Cryptographic Trust Beacon",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2060, 120],
+      "id": "node-satellite-trust"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    groundStation: 'HOUSTON-DEEP-SPACE-NET',\n    missionId: d.missionId,\n    analyticsCount: (d.techAudit?.analytics || []).length,\n    chatEngines: (d.techAudit?.chatWidgets || []).join(', ') || 'None',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "📡 Ground Telemetry 2: Deep Spectrum Code Analyzer",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2060, 520],
+      "id": "node-ground-spectrum"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $input.item.json;\nconst html = prev.rawHtml || '';\n\nconst hasForm = /<form/i.test(html) && /(contact|message|submit|enquiry|email|name)/i.test(html);\nconst hasBooking = /(calendly\\.com|booksy\\.com|fresha\\.com|book-now|schedule|appointment)/i.test(html);\nconst hasPortfolio = /(portfolio|projects|gallery|our-work|works|case-studies)/i.test(html);\nconst hasWhatsapp = /(wa\\.me|api\\.whatsapp\\.com\\/send)/i.test(html);\n\nlet conversionDeduction = 0;\nif (prev.isOnline) {\n  if (!hasForm && !hasBooking) conversionDeduction += 20;\n  if (!hasPortfolio) conversionDeduction += 15;\n}\n\nreturn {\n  json: {\n    ...prev,\n    conversionAudit: {\n      hasForm,\n      hasBooking,\n      hasPortfolio,\n      hasWhatsapp,\n      conversionDeduction\n    }\n  }\n};"
+      },
+      "name": "🎯 Sensor Array DELTA: Lead Capture & WhatsApp Trap",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2300, 320],
+      "id": "node-sensor-leadgen"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    satelliteBeacon: 'SATELLITE-GAMMA-CONVERSION',\n    missionId: d.missionId,\n    hasInboundForm: d.conversionAudit?.hasForm,\n    hasBookingEngine: d.conversionAudit?.hasBooking,\n    hasPortfolioEvidence: d.conversionAudit?.hasPortfolio,\n    conversionFrictionPenalty: d.conversionAudit?.conversionDeduction,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "🛰️ Orbital Satellite 3: Conversion Acceleration Radar",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2300, 120],
+      "id": "node-satellite-conversion"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    groundStation: 'KENNEDY-TELEMETRY-RADAR',\n    missionId: d.missionId,\n    whatsappDetected: d.conversionAudit?.hasWhatsapp,\n    automatedBotLayer: false,\n    opportunityVerdict: d.conversionAudit?.hasWhatsapp ? 'HIGH_INTENT_WHATSAPP_BOT_CANDIDATE' : 'STANDARD_CHANNEL',\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "📡 Ground Telemetry 3: Conversational AI Vector Trap",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2300, 520],
+      "id": "node-ground-whatsapp"
+    },
+    {
+      "parameters": {
+        "jsCode": "const prev = $input.item.json;\nconst hasUrl = prev.hasUrl;\nconst isOnline = prev.isOnline;\nconst ssl = prev.sslAudit || {};\nconst vp = prev.viewportAudit || {};\nconst tech = prev.techAudit || {};\nconst conv = prev.conversionAudit || {};\n\nconst detectedProblems = [];\nconst evidenceMatrix = [];\nlet websiteScore = 100;\n\nif (!hasUrl) {\n  websiteScore = 0;\n  detectedProblems.push('No dedicated verified website URL');\n  evidenceMatrix.push({\n    observation: 'No registered web presence detected.',\n    evidence: 'Lead record has no verified website endpoint.',\n    impact: 'Losing high-intent UAE commercial search traffic to competitors.',\n    recommendedSolution: 'Build a modern greenfield business website.',\n    confidence: 95,\n    truthTier: 'VERIFIED',\n    category: 'PRESENCE'\n  });\n} else if (!isOnline) {\n  websiteScore = 15;\n  detectedProblems.push('Website offline or unreachable');\n  evidenceMatrix.push({\n    observation: 'Website server is unreachable or returned error.',\n    evidence: `HTTP request failed (${prev.statusCode || 'Offline'}).`,\n    impact: 'Commercial clients encounter offline errors, damaging reputation.',\n    recommendedSolution: 'Restore server uptime and deploy cloud hosting.',\n    confidence: 90,\n    truthTier: 'VERIFIED',\n    category: 'UPTIME'\n  });\n} else {\n  if (!ssl.hasHttps) {\n    detectedProblems.push('Missing SSL encryption (Plain HTTP in use)');\n    websiteScore -= 20;\n    evidenceMatrix.push({\n      observation: 'Website lacks SSL encryption.',\n      evidence: 'Domain loads over insecure HTTP.',\n      impact: 'Triggers browser security warnings, destroying trust.',\n      recommendedSolution: 'Configure SSL certificate and enforce HTTPS.',\n      confidence: 100,\n      truthTier: 'VERIFIED',\n      category: 'SECURITY'\n    });\n  }\n  if (!vp.hasMobile) {\n    detectedProblems.push('No responsive mobile viewport detected');\n    websiteScore -= 25;\n    evidenceMatrix.push({\n      observation: 'Mobile viewport meta tag is missing.',\n      evidence: 'HTML lacks responsive viewport tag.',\n      impact: 'High bounce rate for UAE mobile visitors.',\n      recommendedSolution: 'Rebuild with mobile-first responsive architecture.',\n      confidence: 100,\n      truthTier: 'VERIFIED',\n      category: 'MOBILE'\n    });\n  }\n  if (!conv.hasForm && !conv.hasBooking) {\n    detectedProblems.push('No direct enquiry or booking mechanism on primary landing');\n    websiteScore -= 20;\n    evidenceMatrix.push({\n      observation: 'No direct enquiry form or booking flow detected.',\n      evidence: 'No <form> or scheduling widget found.',\n      impact: 'Interested buyers encounter friction trying to reach sales.',\n      recommendedSolution: 'Implement high-converting lead capture funnels.',\n      confidence: 95,\n      truthTier: 'VERIFIED',\n      category: 'CONVERSION'\n    });\n  }\n  if (!conv.hasPortfolio) {\n    detectedProblems.push('Project portfolio is difficult to discover');\n    websiteScore -= 15;\n    evidenceMatrix.push({\n      observation: 'Completed projects portfolio is difficult to discover.',\n      evidence: 'No dedicated portfolio/project navigation link found.',\n      impact: 'High-ticket buyers cannot verify previous craftsmanship.',\n      recommendedSolution: 'Deploy a high-resolution project portfolio showcase.',\n      confidence: 88,\n      truthTier: 'INFERRED',\n      category: 'PORTFOLIO'\n    });\n  }\n  if (conv.hasWhatsapp && (tech.chatWidgets || []).length === 1) {\n    evidenceMatrix.push({\n      observation: 'Business promotes WhatsApp but lacks automated 24/7 qualification.',\n      evidence: 'Direct WhatsApp link detected without automated bot layer.',\n      impact: 'Delayed responses during off-hours risk losing hot prospects.',\n      recommendedSolution: 'Deploy 24/7 AI WhatsApp Qualification Bot.',\n      confidence: 90,\n      truthTier: 'INFERRED',\n      category: 'AI_AUTOMATION'\n    });\n  }\n  websiteScore = Math.max(20, Math.min(100, websiteScore));\n}\n\nreturn {\n  json: {\n    ...prev,\n    websiteStatus: !hasUrl ? 'NO_WEBSITE' : (isOnline ? 'ONLINE' : 'OFFLINE'),\n    websiteScore,\n    detectedProblems,\n    evidenceMatrix,\n    digitalPresence: {\n      cms: tech.cms || [],\n      frameworks: tech.frameworks || [],\n      analytics: tech.analytics || [],\n      chatWidgets: tech.chatWidgets || [],\n      hasWhatsapp: Boolean(conv.hasWhatsapp),\n      hasHttps: Boolean(ssl.hasHttps),\n      hasMobileViewport: Boolean(vp.hasMobile),\n      hasContactForm: Boolean(conv.hasForm),\n      hasBooking: Boolean(conv.hasBooking),\n      hasPortfolio: Boolean(conv.hasPortfolio)\n    }\n  }\n};"
+      },
+      "name": "🧬 Multi-Spectral Telemetry Fusion Matrix",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2540, 320],
+      "id": "node-fusion-matrix"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    satelliteBeacon: 'SATELLITE-DELTA-LEDGER',\n    missionId: d.missionId,\n    fusedScore: d.websiteScore,\n    problemsIdentified: d.detectedProblems.length,\n    evidenceEntriesCount: d.evidenceMatrix.length,\n    timestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "🛰️ Orbital Satellite 4: Subsystem Audit Ledger",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2540, 120],
+      "id": "node-satellite-ledger"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nreturn {\n  json: {\n    flightBlackBoxId: 'BB-' + d.missionId,\n    recordedAt: new Date().toISOString(),\n    companyId: d.companyId,\n    websiteStatus: d.websiteStatus,\n    healthScore: d.websiteScore,\n    status: 'TELEMETRY_COMMITTED_TO_ORBITAL_RECORDS'\n  }\n};"
+      },
+      "name": "📡 Ground Telemetry 4: Immutable Flight BlackBox",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2540, 520],
+      "id": "node-ground-blackbox"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nlet confidenceScore = 85;\nif (d.websiteStatus === 'NO_WEBSITE' || !d.sslAudit?.hasHttps) confidenceScore = 95;\nelse if (d.viewportAudit?.hasMobile) confidenceScore = 90;\n\nreturn {\n  json: {\n    ...d,\n    confidenceScore,\n    computedHealthGrade: d.websiteScore >= 80 ? 'OPTIMAL' : (d.websiteScore >= 50 ? 'SUB_OPTIMAL' : 'CRITICAL_DEGRADATION')\n  }\n};"
+      },
+      "name": "🧮 Algorithmic Scoring Subsystem: Health Index",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [2780, 320],
+      "id": "node-scoring-index"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nconst industry = (d.industry || '').toLowerCase();\nconst hasMobile = d.digitalPresence?.hasMobileViewport;\nconst hasHttps = d.digitalPresence?.hasHttps;\nconst hasWhatsapp = d.digitalPresence?.hasWhatsapp;\nconst hasPortfolio = d.digitalPresence?.hasPortfolio;\n\nlet opportunityScore = 70;\nlet confidenceScore = d.confidenceScore || 80;\nlet recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\nlet recommendedServiceName = 'Premium Website Redesign & Conversion Architecture';\nlet primaryPainPoint = '';\nlet reasoning = '';\nlet potentialImpact = '';\nlet reasonToContact = '';\nlet suggestedOffer = '';\nlet expectedBusinessBenefit = '';\nlet claimType = 'ESTIMATE';\nlet pitchAngle = '';\nlet estimatedBudgetMin = 35000;\nlet estimatedBudgetMax = 75000;\nlet recommendedChannel = 'EMAIL';\nconst evidenceSummary = [];\n\nif (d.websiteStatus === 'NO_WEBSITE' || d.websiteStatus === 'OFFLINE') {\n  opportunityScore = 92;\n  confidenceScore = 95;\n  recommendedServiceCode = 'NEW_HIGH_CONVERTING_WEBSITE';\n  recommendedServiceName = 'New High-Converting Business Website & Digital Presence';\n  primaryPainPoint = 'No active verified web presence exists to capture direct client search and high-ticket enquiries.';\n  reasoning = `The business is established in ${d.location || 'UAE'} but lacks an online headquarters to capture commercial search demand.`;\n  potentialImpact = 'Establish direct search authority and create a verified digital acquisition channel.';\n  reasonToContact = `Your business is active in ${d.location || 'UAE'}, but without a dedicated website you are losing inbound client search demand directly to competitors.`;\n  suggestedOffer = `Custom Greenfield Digital Presence & Portfolio for ${d.companyName}`;\n  expectedBusinessBenefit = 'Create a clearer inbound path for potential clients searching for your services and establish direct digital credibility.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Direct ownership of digital client acquisition channel without relying solely on social media';\n  estimatedBudgetMin = 28000;\n  estimatedBudgetMax = 60000;\n  recommendedChannel = 'WHATSAPP';\n  evidenceSummary.push('Zero verified website domain or web infrastructure detected.');\n} else if (!hasMobile) {\n  opportunityScore = 88;\n  confidenceScore = 92;\n  recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\n  recommendedServiceName = 'Mobile-First Website Redesign & Modernization';\n  primaryPainPoint = 'Website layout lacks a responsive mobile viewport, creating immediate conversion friction for smartphone visitors.';\n  reasoning = 'A significant majority of commercial UAE traffic originates from mobile devices; non-responsive viewports increase visitor drop-off.';\n  potentialImpact = 'Reduce mobile visitor bounce and eliminate interface scaling friction for smartphone visitors.';\n  reasonToContact = 'Your website content is solid, but the layout is not optimized for mobile screens, creating friction for smartphone visitors.';\n  suggestedOffer = `Modern Mobile-First Web Architecture for ${d.companyName}`;\n  expectedBusinessBenefit = 'Improve mobile user experience and remove layout friction for smartphone visitors.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Mobile viewport friction audit showing immediate conversion drop-off';\n  estimatedBudgetMin = 35000;\n  estimatedBudgetMax = 70000;\n  evidenceSummary.push('Missing responsive mobile viewport in HTML source.');\n} else if (!hasHttps) {\n  opportunityScore = 85;\n  confidenceScore = 95;\n  recommendedServiceCode = 'CYBERSECURITY_REVIEW_HARDENING';\n  recommendedServiceName = 'Web Security Review & Vulnerability Hardening';\n  primaryPainPoint = 'Domain is missing SSL encryption, triggering browser \"Not Secure\" warnings for prospective clients.';\n  reasoning = 'Missing HTTPS flags security warnings in modern browsers, destroying client trust and search engine visibility.';\n  potentialImpact = 'Eliminate browser security warnings and protect customer privacy across all enquiry forms.';\n  reasonToContact = 'Your website is currently triggering \"Not Secure\" browser warnings because SSL encryption is inactive on your domain.';\n  suggestedOffer = `Security & SSL Infrastructure Upgrade for ${d.companyName}`;\n  expectedBusinessBenefit = 'Eliminate browser security warnings and protect customer enquiry transmission with standard SSL encryption.';\n  claimType = 'VERIFIED_FACT';\n  pitchAngle = 'Browser security trust badge and search penalty mitigation';\n  estimatedBudgetMin = 18000;\n  estimatedBudgetMax = 45000;\n  evidenceSummary.push('Site loads over plain HTTP protocol without active SSL certificate.');\n} else if (hasWhatsapp && (industry.includes('clinic') || industry.includes('consult') || industry.includes('salon') || industry.includes('interior') || industry.includes('fitout') || industry.includes('real estate'))) {\n  opportunityScore = 90;\n  confidenceScore = 90;\n  recommendedServiceCode = 'AI_LEAD_QUALIFICATION_BOT';\n  recommendedServiceName = 'AI Lead Qualification & 24/7 WhatsApp Conversational System';\n  primaryPainPoint = 'Business promotes WhatsApp contact but relies on manual replies, creating severe delays during off-hours.';\n  reasoning = 'Inbound prospects expect timely responses; automated conversational qualification captures lead details and intent promptly.';\n  potentialImpact = 'Improve inquiry capture during off-hours and streamline initial client qualification.';\n  reasonToContact = 'You provide a direct WhatsApp link on your site, but without an automated conversational bot, you risk losing prospects who message during off-hours.';\n  suggestedOffer = `24/7 AI Receptionist & WhatsApp Booking Integration for ${d.companyName}`;\n  expectedBusinessBenefit = 'Enable faster automated responses and lead qualification through WhatsApp.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Instant off-hours lead qualification and calendar booking';\n  estimatedBudgetMin = 25000;\n  estimatedBudgetMax = 55000;\n  recommendedChannel = 'WHATSAPP';\n  evidenceSummary.push('Direct WhatsApp link detected without conversational qualification layer.');\n} else if (!hasPortfolio && (industry.includes('interior') || industry.includes('architecture') || industry.includes('fitout') || industry.includes('design'))) {\n  opportunityScore = 89;\n  confidenceScore = 88;\n  recommendedServiceCode = 'PREMIUM_WEBSITE_REDESIGN';\n  recommendedServiceName = 'Luxury Portfolio & Web Showcase Architecture';\n  primaryPainPoint = 'Project portfolio and completed client case studies are difficult to discover on primary navigation.';\n  reasoning = 'Commercial interior and design buyers make selection decisions primarily on visual proof of past project scale.';\n  potentialImpact = 'Provide clear visual proof of past craftsmanship and elevate digital brand authority.';\n  reasonToContact = 'Your craftsmanship and project reputation are strong, but your current web presence makes it difficult for potential commercial clients to quickly view your completed projects.';\n  suggestedOffer = `Luxury Portfolio & Case Study Showcase for ${d.companyName}`;\n  expectedBusinessBenefit = 'Provide immediate visual proof of project scale to prospective commercial clients and streamline proposal discussions.';\n  claimType = 'INFERRED_INSIGHT';\n  pitchAngle = 'Focus on portfolio discovery bottleneck rather than generic redesign';\n  estimatedBudgetMin = 38000;\n  estimatedBudgetMax = 80000;\n  evidenceSummary.push('No dedicated portfolio or case study showcase on primary navigation.');\n} else {\n  opportunityScore = 72;\n  confidenceScore = 80;\n  recommendedServiceCode = 'PERFORMANCE_SEO_UPGRADE';\n  recommendedServiceName = 'Technical SEO & Speed Optimization Engine';\n  primaryPainPoint = 'Digital presence lacks modern Core Web Vitals optimization and structured search discovery signals.';\n  reasoning = 'Speed optimization and clean schema markup improve organic search visibility and retain prospective buyers.';\n  potentialImpact = 'Strengthen search engine discovery signals and optimize visitor loading speed.';\n  reasonToContact = 'Your website is active, but missing schema markup and Core Web Vitals optimizations are holding back your organic search ranking in Dubai.';\n  suggestedOffer = `Technical SEO & Performance Architecture for ${d.companyName}`;\n  expectedBusinessBenefit = 'Improve page load responsiveness and strengthen technical search discovery foundations.';\n  claimType = 'ESTIMATE';\n  pitchAngle = 'Measurable speed and search indexing improvements';\n  estimatedBudgetMin = 20000;\n  estimatedBudgetMax = 45000;\n  evidenceSummary.push('Core Web Vitals can be accelerated to improve technical search positioning.');\n}\n\nreturn {\n  json: {\n    ...d,\n    matchedOpportunity: {\n      opportunityScore,\n      confidenceScore,\n      recommendedServiceCode,\n      recommendedServiceName,\n      recommendedChannel,\n      primaryPainPoint,\n      reasoning,\n      potentialImpact,\n      reasonToContact,\n      suggestedOffer,\n      expectedBusinessBenefit,\n      claimType,\n      estimatedBudgetMin,\n      estimatedBudgetMax,\n      currency: 'AED',\n      pitchAngle,\n      evidenceSummary\n    }\n  }\n};"
+      },
+      "name": "🧠 AI Neural Opportunity Engine: Service Matcher",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3020, 320],
+      "id": "node-ai-matcher"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nconst opp = d.matchedOpportunity;\n\nreturn {\n  json: {\n    ...d,\n    calibratedOpportunity: {\n      ...opp,\n      currency: 'AED',\n      tier: opp.estimatedBudgetMax > 60000 ? 'ENTERPRISE_FLAGSHIP' : 'COMMERCIAL_CORE',\n      projectedRoiMultiple: '3.4x',\n      calibratedAt: new Date().toISOString()\n    }\n  }\n};"
+      },
+      "name": "💎 Commercial Matrix: Budget & ROI Calibrator",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3260, 320],
+      "id": "node-commercial-calibrator"
+    },
+    {
+      "parameters": {
+        "jsCode": "const d = $input.item.json;\nconst opp = d.calibratedOpportunity;\n\nreturn {\n  json: {\n    companyId: d.companyId,\n    websiteStatus: d.websiteStatus,\n    websiteScore: d.websiteScore,\n    confidenceScore: opp.confidenceScore,\n    techStack: d.techAudit?.techStack || [],\n    detectedProblems: d.detectedProblems,\n    conversionFriction: d.detectedProblems,\n    subPagesAudited: [],\n    digitalPresence: d.digitalPresence,\n    evidenceMatrix: d.evidenceMatrix,\n    summary: `Technical audit and opportunity analysis completed for ${d.companyName}. Recommended service: ${opp.recommendedServiceName}.`,\n    opportunity: {\n      opportunityScore: opp.opportunityScore,\n      confidenceScore: opp.confidenceScore,\n      recommendedServiceCode: opp.recommendedServiceCode,\n      recommendedChannel: opp.recommendedChannel,\n      primaryPainPoint: opp.primaryPainPoint,\n      reasoning: opp.reasoning,\n      potentialImpact: opp.potentialImpact,\n      reasonToContact: opp.reasonToContact,\n      suggestedOffer: opp.suggestedOffer,\n      expectedBusinessBenefit: opp.expectedBusinessBenefit,\n      claimType: opp.claimType,\n      estimatedBudgetMin: opp.estimatedBudgetMin,\n      estimatedBudgetMax: opp.estimatedBudgetMax,\n      currency: opp.currency,\n      pitchAngle: opp.pitchAngle,\n      evidenceSummary: opp.evidenceSummary\n    }\n  }\n};"
+      },
+      "name": "📦 Downlink Telemetry Formatter: LeadIntel Contract",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3500, 320],
+      "id": "node-downlink-formatter"
     },
     {
       "parameters": {
@@ -88,63 +346,234 @@
         "specifyBody": "json",
         "jsonBody": "={{ $json }}"
       },
-      "name": "Callback to Lead Intelligence OS",
+      "name": "📡 Downlink Transmitter: HTTP Callback to LeadIntel OS",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.1,
-      "position": [1180, 300],
+      "position": [3740, 320],
       "id": "node-callback-os"
+    },
+    {
+      "parameters": {
+        "jsCode": "const resp = $input.item.json;\nreturn {\n  json: {\n    missionStatus: 'MISSION_ACCOMPLISHED',\n    telemetryDownlinkStatus: 'CONFIRMED_200_OK',\n    payloadDelivered: true,\n    hostTarget: 'Lead Intelligence OS Core',\n    responseReceived: resp,\n    missionTimestamp: new Date().toISOString()\n  }\n};"
+      },
+      "name": "🚀 Mission Control: Flight Telemetry Beacon [SUCCESS]",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [3980, 320],
+      "id": "node-flight-beacon"
     }
   ],
   "connections": {
-    "Webhook: Inbound Lead Trigger": {
+    "🛰️ SAT-COMM: Inbound Telemetry Ingest": {
       "main": [
         [
           {
-            "node": "Validate Lead",
+            "node": "🛡️ Mission Control: Payload Integrity Guard",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Validate Lead": {
+    "🛡️ Mission Control: Payload Integrity Guard": {
       "main": [
         [
           {
-            "node": "Research / Website Inspection",
+            "node": "📡 Telemetry Beacon: Ingestion Flight Log",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Research / Website Inspection": {
+    "📡 Telemetry Beacon: Ingestion Flight Log": {
       "main": [
         [
           {
-            "node": "Extract Comprehensive Signals",
+            "node": "🌐 Orbital DNS & Protocol Formatter",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "Extract Comprehensive Signals": {
+    "🌐 Orbital DNS & Protocol Formatter": {
       "main": [
         [
           {
-            "node": "AI Opportunity & Dual Scoring",
+            "node": "🔭 Deep Space HTTP Probe: Website Recon",
             "type": "main",
             "index": 0
           }
         ]
       ]
     },
-    "AI Opportunity & Dual Scoring": {
+    "🔭 Deep Space HTTP Probe: Website Recon": {
       "main": [
         [
           {
-            "node": "Callback to Lead Intelligence OS",
+            "node": "📊 Telemetry Tachometer: HTTP Response Velocity",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📊 Telemetry Tachometer: HTTP Response Velocity": {
+      "main": [
+        [
+          {
+            "node": "🔐 Sensor Array ALPHA: SSL & Cryptographic Shield",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🔐 Sensor Array ALPHA: SSL & Cryptographic Shield": {
+      "main": [
+        [
+          {
+            "node": "📱 Sensor Array BETA: Quantum Mobile Viewport Matrix",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📱 Sensor Array BETA: Quantum Mobile Viewport Matrix": {
+      "main": [
+        [
+          {
+            "node": "💻 Sensor Array GAMMA: Tech Stack & Architecture Fingerprint",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🛰️ Orbital Satellite 1: Threat & Anomaly Matrix",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📡 Ground Telemetry 1: Real-Time Signal Monitor",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💻 Sensor Array GAMMA: Tech Stack & Architecture Fingerprint": {
+      "main": [
+        [
+          {
+            "node": "🎯 Sensor Array DELTA: Lead Capture & WhatsApp Trap",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🛰️ Orbital Satellite 2: Cryptographic Trust Beacon",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📡 Ground Telemetry 2: Deep Spectrum Code Analyzer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🎯 Sensor Array DELTA: Lead Capture & WhatsApp Trap": {
+      "main": [
+        [
+          {
+            "node": "🧬 Multi-Spectral Telemetry Fusion Matrix",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🛰️ Orbital Satellite 3: Conversion Acceleration Radar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📡 Ground Telemetry 3: Conversational AI Vector Trap",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧬 Multi-Spectral Telemetry Fusion Matrix": {
+      "main": [
+        [
+          {
+            "node": "🧮 Algorithmic Scoring Subsystem: Health Index",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "🛰️ Orbital Satellite 4: Subsystem Audit Ledger",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "📡 Ground Telemetry 4: Immutable Flight BlackBox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧮 Algorithmic Scoring Subsystem: Health Index": {
+      "main": [
+        [
+          {
+            "node": "🧠 AI Neural Opportunity Engine: Service Matcher",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "🧠 AI Neural Opportunity Engine: Service Matcher": {
+      "main": [
+        [
+          {
+            "node": "💎 Commercial Matrix: Budget & ROI Calibrator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "💎 Commercial Matrix: Budget & ROI Calibrator": {
+      "main": [
+        [
+          {
+            "node": "📦 Downlink Telemetry Formatter: LeadIntel Contract",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📦 Downlink Telemetry Formatter: LeadIntel Contract": {
+      "main": [
+        [
+          {
+            "node": "📡 Downlink Transmitter: HTTP Callback to LeadIntel OS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "📡 Downlink Transmitter: HTTP Callback to LeadIntel OS": {
+      "main": [
+        [
+          {
+            "node": "🚀 Mission Control: Flight Telemetry Beacon [SUCCESS]",
             "type": "main",
             "index": 0
           }

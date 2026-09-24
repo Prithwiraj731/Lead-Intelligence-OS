@@ -78,9 +78,9 @@ export class GmailOAuthEmailProvider implements DeliveryProvider {
 
     // 3. Obtain valid access token
     const accessToken = await getValidGmailAccessToken();
-    if (!accessToken) {
+    if (!accessToken || accessToken.startsWith("mock-")) {
       throw new Error(
-        "GMAIL_OAUTH_TOKEN_MISSING: No valid OAuth access token available. Please reconnect Gmail."
+        "GMAIL_OAUTH_TOKEN_MISSING: No live Google OAuth session found. Please click 'Connect Gmail' in Pilot or Settings to sign into your Google account."
       );
     }
 
@@ -96,25 +96,23 @@ export class GmailOAuthEmailProvider implements DeliveryProvider {
     let providerMessageId = `gmail-${Date.now()}`;
 
     // 5. If live network dispatch is permitted, call Google Gmail API
-    if (process.env.NODE_ENV !== "test" && !accessToken.startsWith("mock-")) {
-      const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ raw: rawMessage }),
-      });
+    const response = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ raw: rawMessage }),
+    });
 
-      if (!response.ok) {
-        const errorDetails = await response.text();
-        throw new Error(`Gmail API dispatch failed (${response.status}): ${errorDetails}`);
-      }
+    if (!response.ok) {
+      const errorDetails = await response.text();
+      throw new Error(`Gmail API dispatch failed (${response.status}): ${errorDetails}`);
+    }
 
-      const responseData = await response.json();
-      if (responseData.id) {
-        providerMessageId = responseData.id;
-      }
+    const responseData = await response.json();
+    if (responseData.id) {
+      providerMessageId = responseData.id;
     }
 
     return {

@@ -1,0 +1,211 @@
+================================================================================
+ LEAD INTELLIGENCE OS - GMAIL SETUP & LIVE EMAIL OUTREACH GUIDE
+================================================================================
+
+This guide walks you through every single step required to configure real Gmail
+sending so that after you research leads and edit email drafts, you can dispatch
+actual emails through your Gmail account.
+
+--------------------------------------------------------------------------------
+PART 1: GOOGLE CLOUD CONSOLE SETUP (OAUTH 2.0 CREDENTIALS)
+--------------------------------------------------------------------------------
+
+To send emails directly through your personal or Google Workspace Gmail account,
+you need an OAuth 2.0 Client ID and Secret from Google Cloud.
+
+Step 1: Create a Google Cloud Project
+  1. Open https://console.cloud.google.com/ in your browser.
+  2. Sign in with the Google / Gmail account you want to send emails from.
+  3. Click the Project dropdown at the top and click "NEW PROJECT".
+  4. Project Name: "Lead Intelligence OS" (or any name you prefer).
+  5. Click "CREATE" and select the newly created project.
+
+Step 2: Enable the Gmail API
+  1. In the search bar at the top, type "Gmail API".
+  2. Click on "Gmail API" from the marketplace/services list.
+  3. Click "ENABLE".
+
+Step 3: Configure the OAuth Consent Screen
+  1. In the left navigation menu, go to "APIs & Services" > "OAuth consent screen".
+  2. User Type: Select "External" and click "CREATE".
+  3. App information:
+     - App name: "Lead Intelligence OS"
+     - User support email: select your email address.
+     - Developer contact email: enter your email address.
+  4. Click "SAVE AND CONTINUE".
+  5. Scopes:
+     - Click "ADD OR REMOVE SCOPES".
+     - In the filter search bar, find:
+         https://www.googleapis.com/auth/gmail.send
+         https://www.googleapis.com/auth/userinfo.email
+     - Check both checkboxes and click "UPDATE".
+     - Click "SAVE AND CONTINUE".
+  6. Test users:
+     - Click "+ ADD USERS".
+     - Enter your Gmail address (the one you are sending from).
+       (Important: In "Testing" mode, only added test users can authenticate).
+     - Click "ADD", then click "SAVE AND CONTINUE".
+  7. Click "BACK TO DASHBOARD".
+
+Step 4: Create OAuth 2.0 Web Client Credentials
+  1. In the left navigation menu, click "Credentials".
+  2. Click "+ CREATE CREDENTIALS" at the top and select "OAuth client ID".
+  3. Application type: Select "Web application".
+  4. Name: "Lead Intelligence Web App".
+  5. Authorized redirect URIs:
+     - Click "+ ADD URI".
+     - Enter EXACTLY:
+         http://localhost:3000/api/auth/gmail/callback
+  6. Click "CREATE".
+  7. A modal will pop up displaying:
+     - Your Client ID (looks like: xxx.apps.googleusercontent.com)
+     - Your Client Secret (looks like: GOCSPX-xxx)
+  8. Copy both values.
+
+--------------------------------------------------------------------------------
+PART 2: CONFIGURE THE .env FILE
+--------------------------------------------------------------------------------
+
+Open the ".env" file in your project root:
+c:\Users\USER\Desktop\LEAD INTELLIGENCE OS\.env
+
+Add / update the following lines:
+
+# -------------------------------------------------------------
+# OUTBOUND LIVE EMAIL CONFIGURATION
+# -------------------------------------------------------------
+OUTBOUND_DELIVERY_ENABLED="true"
+OUTBOUND_DRY_RUN="false"
+EMAIL_PROVIDER="gmail"
+
+# -------------------------------------------------------------
+# GMAIL OAUTH CREDENTIALS (from Google Cloud Console)
+# -------------------------------------------------------------
+GMAIL_CLIENT_ID="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
+GMAIL_CLIENT_SECRET="YOUR_GOOGLE_CLIENT_SECRET"
+GMAIL_REDIRECT_URI="http://localhost:3000/api/auth/gmail/callback"
+
+Save the .env file.
+If your dev server is running, restart it so the new environment variables load:
+In terminal: press Ctrl+C, then run:
+  pnpm dev
+
+--------------------------------------------------------------------------------
+PART 3: CONNECT YOUR GMAIL ACCOUNT IN THE UI
+--------------------------------------------------------------------------------
+
+1. Open your browser and go to:
+   http://localhost:3000/pilot
+   (or http://localhost:3000/settings)
+
+2. Look at the "Gmail Account (OAuth 2.0)" card in the sidebar or top banner.
+   - It will currently show: "Gmail Disconnected"
+
+3. Click the button: "Connect Gmail".
+   - You will be redirected to Google's OAuth consent screen.
+   - Sign in to your Gmail account.
+   - You may see a screen saying "Google hasn't verified this app" (since your app is in testing mode). Click "Advanced", then click "Go to Lead Intelligence OS (unsafe)".
+   - Check the permission: "Send email on your behalf".
+   - Click "Continue".
+
+4. Google redirects you back to:
+   http://localhost:3000/pilot
+   - The card will now show:
+     "Connected: your_email@gmail.com" with a green shield/check icon.
+   - The tokens are stored locally on the server in "scratch/.gmail-oauth.json" and refreshed automatically.
+
+--------------------------------------------------------------------------------
+PART 4: THE END-TO-END WORKFLOW (IMPORT -> AUDIT -> EDIT -> APPROVE -> SEND)
+--------------------------------------------------------------------------------
+
+STEP 1: Ingest Leads with Contact Email Addresses
+  1. Go to: http://localhost:3000/leads/import
+  2. Upload your CSV or XLSX file (or use sample_data/dubai_leads.csv).
+  3. Ensure each row has:
+     - Company Name
+     - Contact Name
+     - Contact Email (e.g., target@company.com)
+     - Website / Domain
+  4. Complete import.
+  NOTE: The safety gate strictly blocks disposable/temporary emails (mailinator, 10minutemail, etc.).
+
+STEP 2: Run Research & Technical Opportunity Audit
+  1. Go to: http://localhost:3000/leads
+  2. Click on the lead you want to target.
+  3. Click "Run Research".
+  4. The engine performs:
+     - Deep website crawl (inspecting mobile responsiveness, SSL, CMS, conversion forms).
+     - AI / Rule Engine analysis calculating Opportunity Score and Confidence Score.
+     - Verification that the lead is eligible for outreach (Decision = "PROCEED").
+
+STEP 3: Generate, Review & Edit the Email Draft
+  1. Go to: http://localhost:3000/messages
+  2. Locate the message for that company (initial status is "READY_FOR_REVIEW").
+  3. Click into the message to review:
+     - Pitch angle & verified technical evidence
+     - Subject line
+     - Email body
+  4. Edit Draft:
+     - Click "Edit"
+     - Customize the email body or subject line to your liking
+     - Click "Save Changes"
+
+STEP 4: Approve the Message (Mandatory Safety Gate)
+  1. On the message details page or list, click "Approve".
+  2. Status changes to "APPROVED".
+  CRITICAL: Lead Intelligence OS has a 7-layer safety gate. Unapproved messages CANNOT be sent under any circumstances.
+
+STEP 5: Dispatch the Email Actually via Gmail
+  There are two ways to dispatch the approved email:
+
+  METHOD A: Via Campaign Pilot Console (Recommended)
+    1. Navigate to: http://localhost:3000/pilot
+    2. Under "Eligible Pilot Prospects", find your approved lead.
+    3. You will see a mandatory confirmation checkbox:
+       [ ] "I have reviewed this recipient, evidence, and message"
+    4. Check this checkbox.
+    5. Click "Dispatch Safe Email".
+    6. The system executes:
+       - Suppression check (ensure email is not unsubscribed)
+       - 14-day duplicate outreach prevention
+       - Rate limit check (< 20/hr, < 100/day)
+       - Google Gmail API: POST https://gmail.googleapis.com/gmail/v1/users/me/messages/send
+    7. A green delivery receipt modal will appear with:
+       - Status: SENT
+       - Provider: GMAIL_OAUTH
+       - Provider Message ID: Google's unique message ID
+    8. Check your real Gmail account's "Sent" folder — the email will be there!
+
+  METHOD B: Via Messages Queue API
+    You can trigger delivery directly via POST request:
+      POST http://localhost:3000/api/messages/<MESSAGE_ID>/deliver
+      Content-Type: application/json
+      {
+        "channel": "EMAIL",
+        "forceDryRun": false
+      }
+
+--------------------------------------------------------------------------------
+PART 5: SAFETY RULES & LIMITS SUMMARY
+--------------------------------------------------------------------------------
+
+1. Pilot Hard Cap:
+   By default, the pilot campaign limits live sending to 5 real recipients
+   (safety guard against accidental mass blasts during onboarding).
+   To increase this limit, check "PILOT_MAX_REAL_RECIPIENTS" in:
+   apps/web/lib/delivery/safety-gate.ts
+
+2. Rate Limits:
+   - Maximum 20 emails per hour.
+   - Maximum 100 emails per 24 hours.
+
+3. Duplicate Suppression:
+   - If an email was already sent to this company in the last 14 days,
+     the safety gate blocks it with "DUPLICATE_OUTREACH_DETECTED".
+
+4. Idempotency Key:
+   - Every delivery generates a unique SHA-256 hash (messageId + recipient + channel).
+   - If you click send twice, the system returns the existing delivery receipt
+     without re-sending the email.
+
+================================================================================

@@ -9,15 +9,15 @@ import {
   XCircle,
   Mail,
   MessageSquare,
-  Building2,
   Sparkles,
   ArrowRight,
   ExternalLink,
-  ShieldAlert,
   BarChart3,
   Copy,
   Info,
-  Layers,
+  Check,
+  Building2,
+  ChevronRight,
 } from "lucide-react";
 
 export default function ReviewQueuePage() {
@@ -93,29 +93,31 @@ export default function ReviewQueuePage() {
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-16">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-6">
         <div>
-          <div className="flex items-center space-x-2">
-            <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-emerald-950/80 border border-emerald-800/60 text-emerald-400 font-bold">
-              HUMAN APPROVAL GATE
+          <div className="flex items-center space-x-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <CheckCircle2 className="w-3 h-3" />
+              Human Approval Gate
             </span>
+            <span className="text-xs text-slate-500">•</span>
             <span className="text-xs text-slate-400">Zero Unauthorized Sends</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white mt-1">
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
             Outreach Approval Deck ({messages.length})
           </h1>
-          <p className="text-sm text-slate-400 mt-0.5">
-            Carefully audit generated Email and WhatsApp copies. Only approved messages can ever be dispatched.
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Audit AI-generated Email and WhatsApp messages with grounded technical proof. Messages require explicit approval prior to dispatch.
           </p>
         </div>
 
         <select
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="px-3.5 py-2 rounded-lg bg-card border border-border text-xs text-slate-200 focus:outline-none focus:border-blue-500 self-start sm:self-auto font-mono"
+          className="px-3.5 py-2.5 rounded-xl bg-card border border-border/80 text-xs text-slate-200 focus:outline-none focus:border-indigo-500/80 cursor-pointer self-start sm:self-auto transition-all"
         >
           <option value="READY_FOR_REVIEW">Awaiting Review (Pending)</option>
-          <option value="EDITED">Edited Copies (Pending Approval)</option>
+          <option value="EDITED">Edited Copies (Pending)</option>
           <option value="APPROVED">Approved Messages</option>
           <option value="ALL">All Messages</option>
         </select>
@@ -123,27 +125,29 @@ export default function ReviewQueuePage() {
 
       {/* Messages List */}
       {loading ? (
-        <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center space-y-2">
-          <RefreshCw className="w-5 h-5 animate-spin text-blue-500" />
-          <span>Loading approval queue...</span>
+        <div className="py-20 text-center text-slate-400 text-xs flex flex-col items-center space-y-3">
+          <RefreshCw className="w-5 h-5 animate-spin text-indigo-400" />
+          <span className="font-medium text-slate-400">Loading approval queue...</span>
         </div>
       ) : messages.length === 0 ? (
-        <div className="p-12 rounded-2xl border border-dashed border-border text-center space-y-3 bg-card/30">
-          <CheckCircle2 className="w-8 h-8 text-emerald-400 mx-auto" />
-          <p className="text-sm font-semibold text-white">Queue is clear</p>
-          <p className="text-xs text-slate-400">
+        <div className="p-12 rounded-2xl border border-dashed border-border/80 text-center space-y-3 bg-card/20">
+          <div className="w-12 h-12 rounded-2xl bg-card border border-border mx-auto flex items-center justify-center text-slate-500">
+            <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+          </div>
+          <p className="text-sm font-medium text-white">Queue is clear</p>
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             No outbound messages currently awaiting human review.
           </p>
           <Link
             href="/leads"
-            className="inline-flex items-center space-x-2 text-xs px-4 py-2 rounded-lg bg-blue-600/20 border border-blue-500/40 text-blue-400 hover:bg-blue-600 hover:text-white mt-2"
+            className="inline-flex items-center space-x-2 text-xs px-4 py-2 rounded-xl bg-indigo-600/10 text-indigo-300 border border-indigo-500/20 hover:bg-indigo-600/20 transition-all mt-2"
           >
             <span>Browse Leads to Research</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-5">
           {messages.map((msg) => {
             const isProcessing = actionId === msg.id;
             const emailWordCount = (msg.emailBody || "").trim().split(/\s+/).filter(Boolean).length;
@@ -153,57 +157,63 @@ export default function ReviewQueuePage() {
             return (
               <div
                 key={msg.id}
-                className="p-6 rounded-2xl bg-card border border-border hover:border-slate-700 transition-colors space-y-5"
+                className="glass-panel p-5 sm:p-6 rounded-2xl border border-white/[0.06] hover:border-white/[0.12] transition-all space-y-5"
               >
                 {/* Message Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-border/60 pb-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-white/[0.04] pb-4">
                   <div className="flex items-center space-x-3">
-                    <Link
-                      href={`/leads/${msg.company.id}`}
-                      className="text-base font-bold text-white hover:text-blue-400 transition-colors flex items-center space-x-1.5"
-                    >
-                      <span>{msg.company.name}</span>
-                      <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
-                    </Link>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-mono">
-                      {msg.company.industry || msg.company.location || "UAE"}
-                    </span>
+                    <div className="w-8 h-8 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-300 font-semibold text-xs shrink-0">
+                      {msg.company.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <div className="flex items-center space-x-2">
+                        <Link
+                          href={`/leads/${msg.company.id}`}
+                          className="text-base font-semibold text-white hover:text-indigo-300 transition-colors"
+                        >
+                          {msg.company.name}
+                        </Link>
+                        <span className="text-[11px] px-2 py-0.5 rounded-full bg-white/[0.04] text-slate-400 border border-white/[0.06]">
+                          {msg.company.industry || msg.company.location || "UAE"}
+                        </span>
+                      </div>
+                    </div>
                   </div>
 
-                  <div className="flex items-center space-x-3">
+                  <div className="flex items-center space-x-2.5">
                     {msg.qualityScore !== undefined && (
-                      <span className="text-[11px] font-mono px-2.5 py-0.5 rounded bg-emerald-950/80 border border-emerald-800 text-emerald-400 font-bold flex items-center space-x-1">
-                        <BarChart3 className="w-3 h-3" />
-                        <span>QUALITY: {msg.qualityScore}/100</span>
+                      <span className="text-xs px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 font-medium flex items-center space-x-1.5">
+                        <BarChart3 className="w-3.5 h-3.5" />
+                        <span>Quality: {msg.qualityScore}/100</span>
                       </span>
                     )}
 
                     <span
-                      className={`text-[11px] font-mono px-2.5 py-0.5 rounded-full border font-bold ${
+                      className={`text-xs px-2.5 py-1 rounded-full font-medium border ${
                         msg.status === "APPROVED"
-                          ? "bg-emerald-950/80 border-emerald-800 text-emerald-400"
+                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
                           : msg.status === "EDITED"
-                          ? "bg-blue-950/80 border-blue-800 text-blue-400"
-                          : "bg-amber-950/80 border-amber-800 text-amber-400 animate-pulse"
+                          ? "bg-blue-500/10 border-blue-500/20 text-blue-400"
+                          : "bg-amber-500/10 border-amber-500/20 text-amber-400"
                       }`}
                     >
-                      {msg.status}
+                      {msg.status.replace(/_/g, " ")}
                     </span>
                   </div>
                 </div>
 
                 {/* Recipient and Opportunity Banner */}
                 {msg.opportunity && (
-                  <div className="p-3.5 rounded-xl bg-[#0c0e14] border border-border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                     <div>
-                      <span className="text-[10px] text-slate-400 font-mono block">DIAGNOSED OFFER:</span>
-                      <span className="font-semibold text-white">
+                      <span className="text-[10px] text-slate-500 block uppercase font-medium">Diagnosed Opportunity</span>
+                      <span className="font-medium text-slate-200 text-xs">
                         {msg.opportunity.suggestedOffer || msg.opportunity.service?.name}
                       </span>
                     </div>
-                    <div className="sm:text-right font-mono">
-                      <span className="text-[10px] text-slate-400 block">EST. BUDGET</span>
-                      <span className="text-cyan-400 font-bold text-xs">
+                    <div className="sm:text-right">
+                      <span className="text-[10px] text-slate-500 block uppercase font-medium">Estimated Value</span>
+                      <span className="text-slate-300 font-medium text-xs">
                         {(msg.opportunity.currency === "INR" ? "₹" : (msg.opportunity.currency === "USD" ? "$" : (msg.opportunity.currency === "GBP" ? "£" : (msg.opportunity.currency === "EUR" ? "€" : `${msg.opportunity.currency || "AED"} `))))}
                         {Number(msg.opportunity.estimatedBudgetMin).toLocaleString()} –{" "}
                         {(msg.opportunity.currency === "INR" ? "₹" : (msg.opportunity.currency === "USD" ? "$" : (msg.opportunity.currency === "GBP" ? "£" : (msg.opportunity.currency === "EUR" ? "€" : `${msg.opportunity.currency || "AED"} `))))}
@@ -215,76 +225,101 @@ export default function ReviewQueuePage() {
 
                 {/* Evidence Grounding */}
                 {evidenceList.length > 0 && (
-                  <div className="p-3 rounded-xl bg-[#0c0e14]/60 border border-indigo-950 text-xs space-y-1">
-                    <div className="text-[10px] font-mono text-indigo-400 uppercase font-bold flex items-center space-x-1">
-                      <Info className="w-3 h-3 text-indigo-400" />
-                      <span>Grounded On Verified Evidence:</span>
+                  <div className="p-3 rounded-xl bg-indigo-500/[0.04] border border-indigo-500/10 text-xs space-y-1">
+                    <div className="text-[11px] font-medium text-indigo-400 flex items-center space-x-1.5">
+                      <Info className="w-3.5 h-3.5" />
+                      <span>Grounded on verified technical evidence:</span>
                     </div>
-                    {evidenceList.map((ev, i) => (
-                      <p key={i} className="text-[11px] text-slate-300">&bull; {ev}</p>
-                    ))}
+                    <div className="space-y-0.5 pt-0.5">
+                      {evidenceList.map((ev, i) => (
+                        <p key={i} className="text-xs text-slate-400 pl-3 relative before:content-['•'] before:absolute before:left-0 before:text-indigo-400">
+                          {ev}
+                        </p>
+                      ))}
+                    </div>
                   </div>
                 )}
 
                 {/* Side-by-Side Channels */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {/* Email Box */}
-                  <div className="p-4 rounded-xl bg-[#0c0e14] border border-border space-y-3">
-                    <div className="flex items-center justify-between border-b border-border/60 pb-2">
-                      <span className="text-[11px] font-mono font-bold text-blue-400 flex items-center space-x-1">
+                  <div className="p-4 rounded-xl bg-black/20 border border-white/[0.05] space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-white/[0.04] pb-2">
+                      <span className="text-xs font-medium text-indigo-400 flex items-center space-x-1.5">
                         <Mail className="w-3.5 h-3.5" />
-                        <span>EMAIL DRAFT ({emailWordCount}w)</span>
+                        <span>Email Draft</span>
+                        <span className="text-[10px] text-slate-500">({emailWordCount}w)</span>
                       </span>
                       <button
                         onClick={() => copyToClipboard(`Subject: ${msg.emailSubject}\n\n${msg.emailBody}`, `${msg.id}-email`)}
-                        className="text-[10px] font-mono text-slate-400 hover:text-white flex items-center space-x-1"
+                        className="text-xs text-slate-400 hover:text-white flex items-center space-x-1 transition-colors px-2 py-0.5 rounded-lg hover:bg-white/[0.05]"
                       >
-                        <Copy className="w-3 h-3" />
-                        <span>{copiedId === `${msg.id}-email` ? "COPIED!" : "COPY"}</span>
+                        {copiedId === `${msg.id}-email` ? (
+                          <>
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span className="text-emerald-400 text-[11px]">Copied</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3 h-3" />
+                            <span className="text-[11px]">Copy</span>
+                          </>
+                        )}
                       </button>
                     </div>
 
-                    <div className="text-xs font-mono text-slate-400">
-                      Subject: <span className="text-slate-200 font-sans font-medium">{msg.emailSubject}</span>
+                    <div className="text-xs text-slate-400">
+                      <span className="text-slate-500 font-medium">Subject:</span>{" "}
+                      <span className="text-slate-200 font-medium">{msg.emailSubject}</span>
                     </div>
 
-                    <div className="text-xs whitespace-pre-line text-slate-200 leading-relaxed font-sans max-h-48 overflow-y-auto pr-1">
+                    <div className="text-xs whitespace-pre-line text-slate-300 leading-relaxed max-h-48 overflow-y-auto pr-1">
                       {msg.emailBody}
                     </div>
                   </div>
 
                   {/* WhatsApp Box */}
-                  <div className="p-4 rounded-xl bg-emerald-950/10 border border-emerald-800/40 space-y-3">
-                    <div className="flex items-center justify-between border-b border-emerald-900/40 pb-2">
-                      <span className="text-[11px] font-mono font-bold text-emerald-400 flex items-center space-x-1">
+                  <div className="p-4 rounded-xl bg-emerald-500/[0.03] border border-emerald-500/10 space-y-2.5">
+                    <div className="flex items-center justify-between border-b border-emerald-500/10 pb-2">
+                      <span className="text-xs font-medium text-emerald-400 flex items-center space-x-1.5">
                         <MessageSquare className="w-3.5 h-3.5" />
-                        <span>WHATSAPP DRAFT ({whatsappWordCount}w)</span>
+                        <span>WhatsApp Angle</span>
+                        <span className="text-[10px] text-emerald-500/70">({whatsappWordCount}w)</span>
                       </span>
                       {msg.whatsappBody && (
                         <button
                           onClick={() => copyToClipboard(msg.whatsappBody, `${msg.id}-wa`)}
-                          className="text-[10px] font-mono text-emerald-400 hover:text-emerald-300 flex items-center space-x-1"
+                          className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center space-x-1 transition-colors px-2 py-0.5 rounded-lg hover:bg-emerald-500/10"
                         >
-                          <Copy className="w-3 h-3" />
-                          <span>{copiedId === `${msg.id}-wa` ? "COPIED!" : "COPY"}</span>
+                          {copiedId === `${msg.id}-wa` ? (
+                            <>
+                              <Check className="w-3 h-3 text-emerald-400" />
+                              <span className="text-emerald-400 text-[11px]">Copied</span>
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="w-3 h-3" />
+                              <span className="text-[11px]">Copy</span>
+                            </>
+                          )}
                         </button>
                       )}
                     </div>
 
-                    <div className="p-3 rounded-xl bg-emerald-900/20 text-xs text-slate-200 leading-relaxed font-sans max-h-48 overflow-y-auto">
-                      {msg.whatsappBody || "No WhatsApp copy generated."}
+                    <div className="text-xs whitespace-pre-line text-slate-300 leading-relaxed max-h-48 overflow-y-auto">
+                      {msg.whatsappBody || "No WhatsApp angle generated."}
                     </div>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex items-center justify-between pt-2 border-t border-border/60">
+                <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
                   <div className="flex items-center space-x-3">
                     {msg.status !== "APPROVED" && (
                       <button
                         onClick={() => handleApprove(msg.id)}
                         disabled={isProcessing}
-                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center space-x-1.5 transition-colors shadow-lg shadow-emerald-900/20"
+                        className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium flex items-center space-x-1.5 transition-all shadow-md shadow-emerald-600/20 active:scale-95 disabled:opacity-50"
                       >
                         {isProcessing ? (
                           <RefreshCw className="w-3.5 h-3.5 animate-spin" />
@@ -297,10 +332,10 @@ export default function ReviewQueuePage() {
 
                     <Link
                       href={`/leads/${msg.company.id}`}
-                      className="px-3.5 py-2 rounded-xl bg-card hover:bg-card-hover border border-border text-slate-300 text-xs font-medium flex items-center space-x-1.5"
+                      className="px-3.5 py-2 rounded-xl bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.08] text-slate-300 text-xs font-medium flex items-center space-x-1.5 transition-all"
                     >
                       <Edit3 className="w-3.5 h-3.5" />
-                      <span>Side-by-Side Review / Edit</span>
+                      <span>Review / Edit</span>
                     </Link>
                   </div>
 
@@ -308,7 +343,7 @@ export default function ReviewQueuePage() {
                     <button
                       onClick={() => handleReject(msg.id)}
                       disabled={isProcessing}
-                      className="text-xs text-slate-400 hover:text-rose-400 transition-colors font-mono"
+                      className="text-xs text-slate-400 hover:text-rose-400 transition-colors"
                     >
                       Skip / Reject
                     </button>

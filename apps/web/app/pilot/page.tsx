@@ -61,8 +61,7 @@ export default function CampaignPilotPage() {
   const handleConnectGmail = async () => {
     try {
       setConnectingGmail(true);
-      setOauthBanner(null);
-      const res = await fetch("/api/auth/gmail/url?redirectUri=" + encodeURIComponent(window.location.origin + "/api/auth/gmail/callback?returnTo=/pilot"));
+      const res = await fetch("/api/auth/gmail/url?returnTo=/pilot");
       const json = await res.json();
       if (json.success && json.authUrl) {
         window.location.href = json.authUrl;
@@ -236,34 +235,30 @@ export default function CampaignPilotPage() {
   return (
     <div className="space-y-8 max-w-7xl mx-auto pb-20">
       {/* Header Bar */}
-      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border pb-6">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border/60 pb-6">
         <div>
-          <div className="flex items-center space-x-3 mb-2">
-            <span className="px-2.5 py-1 rounded text-xs font-mono bg-blue-950/80 border border-blue-800/60 text-blue-400 font-bold flex items-center gap-1.5">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              MILESTONE 3D
+          <div className="flex items-center space-x-2 mb-1.5">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              <ShieldCheck className="w-3 h-3" />
+              Controlled Pilot Sandbox
             </span>
-            <span className="px-2.5 py-1 rounded text-xs font-mono bg-amber-950/80 border border-amber-800/60 text-amber-400 font-bold">
-              MAX 5 RECIPIENTS HARD CAP
-            </span>
-            <span className="px-2.5 py-1 rounded text-xs font-mono bg-purple-950/80 border border-purple-800/60 text-purple-400 font-bold">
-              CONTROLLED PILOT
-            </span>
+            <span className="text-xs text-slate-500">•</span>
+            <span className="text-xs text-slate-400">Strict 5-Recipient Safety Cap</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white flex items-center gap-2">
-            Controlled Real Email Pilot Campaign
+          <h1 className="text-2xl sm:text-3xl font-semibold tracking-tight text-white">
+            Campaign Pilot Console
           </h1>
-          <p className="text-sm text-slate-400 mt-1 max-w-3xl">
-            Controlled execution environment for the first 5 real email recipients. Requires explicit human review of research evidence, opportunity diagnosis, and copy before delivery.
+          <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-3xl leading-relaxed">
+            Controlled execution environment for the initial live pilot recipients. Requires mandatory human sign-off on technical proof, diagnosed angle, and copy before delivery.
           </p>
         </div>
 
         {/* Action Controls & Quota Gauge */}
-        <div className="flex items-center gap-4 bg-card/60 border border-border/80 rounded-xl p-4">
+        <div className="flex items-center gap-4 glass-card border border-white/[0.08] rounded-2xl p-4 self-start lg:self-auto">
           <div className="text-right">
-            <div className="text-xs font-mono text-slate-400 uppercase tracking-wider">Pilot Quota</div>
-            <div className="text-xl font-bold text-white font-mono flex items-center justify-end gap-1.5">
-              <span className={metrics.pilotRecipientsUsed >= 5 ? "text-red-400" : "text-emerald-400"}>
+            <div className="text-[11px] font-medium text-slate-400">Pilot Quota</div>
+            <div className="text-xl font-bold text-white flex items-center justify-end gap-1">
+              <span className={metrics.pilotRecipientsUsed >= 5 ? "text-rose-400" : "text-emerald-400"}>
                 {metrics.pilotRecipientsUsed}
               </span>
               <span className="text-slate-500">/</span>
@@ -272,10 +267,10 @@ export default function CampaignPilotPage() {
             </div>
           </div>
 
-          <div className="w-24 bg-slate-800/80 rounded-full h-2.5 overflow-hidden border border-slate-700">
+          <div className="w-24 bg-white/[0.06] rounded-full h-2 overflow-hidden border border-white/[0.08]">
             <div
               className={`h-full transition-all duration-500 ${
-                metrics.pilotRecipientsUsed >= 5 ? "bg-red-500" : "bg-gradient-to-r from-blue-500 to-emerald-400"
+                metrics.pilotRecipientsUsed >= 5 ? "bg-rose-500" : "bg-gradient-to-r from-indigo-500 to-emerald-400"
               }`}
               style={{
                 width: `${Math.min(100, (metrics.pilotRecipientsUsed / metrics.pilotRecipientsMax) * 100)}%`,
@@ -288,7 +283,7 @@ export default function CampaignPilotPage() {
               fetchPreflight();
               fetchPilotLeads();
             }}
-            className="p-2.5 rounded-lg bg-card border border-border hover:bg-slate-800 text-slate-300 transition-colors"
+            className="p-2.5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-slate-300 hover:text-white transition-all"
             title="Refresh Status"
           >
             <RefreshCw className={`w-4 h-4 ${loading || preflightLoading ? "animate-spin" : ""}`} />
@@ -298,10 +293,10 @@ export default function CampaignPilotPage() {
 
       {/* Error Alert */}
       {errorBanner && (
-        <div className="p-4 rounded-xl bg-red-950/80 border border-red-800/80 text-red-300 flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <span className="font-bold">Safety Gate Notice: </span>
+        <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-300 flex items-start gap-3 text-xs">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+          <div>
+            <span className="font-semibold">Safety Gate Notice: </span>
             {errorBanner}
           </div>
         </div>
@@ -310,10 +305,10 @@ export default function CampaignPilotPage() {
       {/* OAuth Notification Banner */}
       {oauthBanner && (
         <div
-          className={`p-4 rounded-xl border flex items-center justify-between text-xs font-mono ${
+          className={`p-4 rounded-xl border flex items-center justify-between text-xs ${
             oauthBanner.type === "success"
-              ? "bg-emerald-950/80 border-emerald-800/80 text-emerald-300"
-              : "bg-rose-950/80 border-rose-800/80 text-rose-300"
+              ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-300"
+              : "bg-rose-500/10 border-rose-500/20 text-rose-300"
           }`}
         >
           <div className="flex items-center space-x-2">
@@ -334,34 +329,34 @@ export default function CampaignPilotPage() {
       )}
 
       {/* Gmail OAuth Authentication & Verified Sender Bar */}
-      <div className="p-4 sm:p-5 rounded-xl bg-gradient-to-r from-[#0e121e] via-[#0d1019] to-blue-950/30 border border-blue-900/50 flex flex-col md:flex-row md:items-center justify-between gap-4">
+      <div className="glass-panel p-5 rounded-2xl border border-white/[0.08] flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start space-x-3.5">
-          <div className="w-10 h-10 rounded-xl bg-blue-950/80 border border-blue-800/60 flex items-center justify-center text-blue-400 shrink-0">
+          <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 shrink-0">
             <Mail className="w-5 h-5" />
           </div>
           <div className="space-y-1">
             <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono font-bold text-white uppercase">
-                GMAIL API OAUTH 2.0 SENDER IDENTITY
+              <span className="text-xs font-semibold text-white">
+                Gmail API OAuth 2.0 Sender Identity
               </span>
               {loadingGmail ? (
-                <span className="text-[10px] font-mono text-slate-400">checking...</span>
+                <span className="text-[10px] text-slate-500">checking...</span>
               ) : gmailStatus?.connected ? (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-950 text-emerald-400 border border-emerald-800">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   CONNECTED
                 </span>
               ) : (
-                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-slate-400 border border-slate-700">
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-white/[0.04] text-slate-400 border border-white/[0.08]">
                   DISCONNECTED
                 </span>
               )}
             </div>
-            <p className="text-xs text-slate-300">
+            <p className="text-xs text-slate-400">
               Verified Sender:{" "}
-              <strong className="text-white font-mono">
+              <strong className="text-slate-200">
                 {gmailStatus?.email || "prithwi1016@gmail.com"}
               </strong>{" "}
-              &bull; <span className="text-slate-400">Tokens stored server-side only (zero password storage)</span>
+              &bull; <span className="text-slate-500">Tokens stored server-side only (zero password storage)</span>
             </p>
           </div>
         </div>
@@ -371,53 +366,55 @@ export default function CampaignPilotPage() {
             <button
               onClick={handleDisconnectGmail}
               disabled={disconnectingGmail}
-              className="px-3 py-1.5 rounded-lg bg-rose-950/80 hover:bg-rose-900 border border-rose-800 text-rose-300 text-xs font-mono font-semibold transition-colors disabled:opacity-50 flex items-center space-x-1.5"
+              className="px-3.5 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/20 text-rose-300 text-xs font-medium transition-all disabled:opacity-50 flex items-center space-x-1.5"
             >
               {disconnectingGmail && <RefreshCw className="w-3 h-3 animate-spin" />}
-              <span>DISCONNECT GMAIL</span>
+              <span>Disconnect Gmail</span>
             </button>
           ) : (
             <button
               onClick={handleConnectGmail}
               disabled={connectingGmail}
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-mono font-bold transition-all shadow-lg shadow-blue-900/30 flex items-center space-x-2 disabled:opacity-50"
+              className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium transition-all shadow-md shadow-indigo-600/20 flex items-center space-x-2 disabled:opacity-50 active:scale-95"
             >
               {connectingGmail ? (
                 <RefreshCw className="w-3.5 h-3.5 animate-spin" />
               ) : (
                 <Mail className="w-3.5 h-3.5" />
               )}
-              <span>CONNECT GMAIL (prithwi1016@gmail.com)</span>
+              <span>Connect Gmail (prithwi1016@gmail.com)</span>
             </button>
           )}
         </div>
       </div>
 
       {/* Section 1: Pre-flight Delivery Infrastructure Checklist */}
-      <div className="bg-card/40 border border-border rounded-xl p-5 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-border/60 pb-3">
+      <div className="glass-panel rounded-2xl border border-white/[0.06] p-5 space-y-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/[0.04] pb-3">
           <div className="flex items-center space-x-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider font-mono">
+            <div className="w-6 h-6 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400">
+              <ShieldCheck className="w-3.5 h-3.5" />
+            </div>
+            <h2 className="text-sm font-semibold text-slate-200">
               Pre-Flight Delivery Infrastructure Verification (11 Checks)
             </h2>
           </div>
-          <div className="flex items-center space-x-3 text-xs font-mono">
-            <span className="text-emerald-400">
+          <div className="flex items-center space-x-3 text-xs">
+            <span className="text-emerald-400 font-medium">
               ✓ {preflight?.passedCount ?? 0} Passed
             </span>
             {preflight?.providerManagedCount > 0 && (
-              <span className="text-blue-400">
+              <span className="text-indigo-400 font-medium">
                 ⚡ {preflight.providerManagedCount} Provider Managed
               </span>
             )}
             {preflight?.warningCount > 0 && (
-              <span className="text-amber-400">
+              <span className="text-amber-400 font-medium">
                 ⚠ {preflight.warningCount} Warnings
               </span>
             )}
             {preflight?.failedCount > 0 && (
-              <span className="text-red-400">
+              <span className="text-rose-400 font-medium">
                 ✕ {preflight.failedCount} Failed
               </span>
             )}
@@ -425,8 +422,8 @@ export default function CampaignPilotPage() {
         </div>
 
         {preflightLoading ? (
-          <div className="py-6 text-center text-slate-400 text-xs font-mono flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
+          <div className="py-6 text-center text-slate-500 text-xs flex items-center justify-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
             Verifying DNS authentication (SPF, DKIM, DMARC), Resend/SMTP config, and rate limiters...
           </div>
         ) : (
@@ -434,25 +431,25 @@ export default function CampaignPilotPage() {
             {(preflight?.checks || []).map((check: any) => (
               <div
                 key={check.id}
-                className="p-3 rounded-lg bg-[#0d0f17] border border-border/80 flex items-start space-x-3 text-xs"
+                className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] flex items-start space-x-3 text-xs"
               >
                 <div className="mt-0.5 shrink-0">
                   {check.status === "PASSED" ? (
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                   ) : check.status === "PROVIDER_MANAGED" ? (
-                    <Sparkles className="w-4 h-4 text-blue-400" />
+                    <Sparkles className="w-4 h-4 text-indigo-400" />
                   ) : check.status === "WARNING" ? (
                     <AlertTriangle className="w-4 h-4 text-amber-400" />
                   ) : (
-                    <ShieldAlert className="w-4 h-4 text-red-400" />
+                    <ShieldAlert className="w-4 h-4 text-rose-400" />
                   )}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between gap-1">
                     <span className="font-medium text-slate-200 truncate">{check.name}</span>
                     {check.status === "PROVIDER_MANAGED" && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded bg-blue-950 text-blue-400 border border-blue-800 shrink-0 font-bold">
-                        PROVIDER MANAGED
+                      <span className="text-[9px] px-1.5 py-0.5 rounded-md bg-indigo-500/10 text-indigo-300 border border-indigo-500/20 shrink-0 font-medium">
+                        MANAGED
                       </span>
                     )}
                   </div>
@@ -468,24 +465,26 @@ export default function CampaignPilotPage() {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
-            <Mail className="w-4 h-4 text-blue-400" />
-            <h2 className="text-sm font-semibold text-white uppercase tracking-wider font-mono">
-              Pilot Candidates ({eligibleLeads.length} Eligible PROCEED Leads)
+            <div className="w-6 h-6 rounded-lg bg-indigo-500/10 flex items-center justify-center text-indigo-400">
+              <Mail className="w-3.5 h-3.5" />
+            </div>
+            <h2 className="text-sm font-semibold text-slate-200">
+              Pilot Candidates ({eligibleLeads.length} Eligible Accounts)
             </h2>
           </div>
-          <div className="text-xs text-slate-400 font-mono">
+          <div className="text-xs text-slate-500">
             Hard Pilot Cap: Maximum 5 Deliveries Total
           </div>
         </div>
 
         {loading ? (
-          <div className="py-12 text-center text-slate-400 text-xs font-mono flex items-center justify-center gap-2">
-            <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
+          <div className="py-12 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+            <RefreshCw className="w-4 h-4 animate-spin text-indigo-400" />
             Loading pilot candidate queue...
           </div>
         ) : eligibleLeads.length === 0 ? (
-          <div className="py-12 text-center bg-card/30 border border-border/60 rounded-xl p-6 text-slate-400 text-sm">
-            No eligible PROCEED leads found with verified email contacts. Please import leads and execute research.
+          <div className="py-12 text-center glass-card border border-white/[0.06] rounded-2xl p-6 text-slate-400 text-xs">
+            No eligible leads found with verified email contacts. Please import leads and execute research.
           </div>
         ) : (
           <div className="space-y-4">
@@ -500,18 +499,18 @@ export default function CampaignPilotPage() {
               return (
                 <div
                   key={lead.companyId}
-                  className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                  className={`rounded-2xl border transition-all duration-200 overflow-hidden ${
                     isDelivered
-                      ? "bg-[#0b1219]/70 border-emerald-900/50"
+                      ? "glass-panel border-emerald-500/30"
                       : isApproved
-                      ? "bg-[#0f121d] border-blue-900/50 shadow-lg shadow-blue-950/20"
-                      : "bg-[#0c0d14] border-border/70"
+                      ? "glass-panel border-indigo-500/30 shadow-lg shadow-indigo-950/20"
+                      : "glass-card border-white/[0.06]"
                   }`}
                 >
                   {/* Summary Header */}
                   <div className="p-4 sm:p-5 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div className="flex items-start space-x-3.5 min-w-0 flex-1">
-                      <div className="w-9 h-9 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shrink-0 font-mono font-bold text-xs">
+                      <div className="w-9 h-9 rounded-xl bg-white/[0.04] border border-white/[0.08] flex items-center justify-center text-slate-300 shrink-0 font-medium text-xs">
                         #{idx + 1}
                       </div>
                       <div className="min-w-0 flex-1">
@@ -519,24 +518,24 @@ export default function CampaignPilotPage() {
                           <span className="font-semibold text-base text-white truncate">
                             {lead.companyName}
                           </span>
-                          <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-blue-950/60 border border-blue-800/40 text-blue-300">
+                          <span className="px-2 py-0.5 rounded-full text-[11px] bg-indigo-500/10 text-indigo-300 border border-indigo-500/20">
                             {lead.industry}
                           </span>
-                          <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-slate-800 text-slate-300">
+                          <span className="px-2 py-0.5 rounded-full text-[11px] bg-white/[0.04] text-slate-400 border border-white/[0.06]">
                             {lead.location}
                           </span>
                         </div>
 
-                        <div className="flex flex-wrap items-center gap-3 mt-1 text-xs text-slate-400">
-                          <span className="text-slate-300 font-mono">
-                            Recipient: <strong className="text-white">{lead.recipientEmail}</strong>
+                        <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-slate-400">
+                          <span className="text-slate-300">
+                            Recipient: <strong className="text-white font-mono text-[11px]">{lead.recipientEmail}</strong>
                           </span>
                           <span>•</span>
-                          <span className="text-emerald-400 font-mono">
+                          <span className="text-amber-400 font-medium">
                             Opp Score: <strong>{lead.opportunityScore}</strong>
                           </span>
                           <span>•</span>
-                          <span className="text-blue-400 font-mono">
+                          <span className="text-cyan-400 font-medium">
                             Conf: <strong>{lead.confidenceScore}%</strong>
                           </span>
                           <span>•</span>
@@ -548,38 +547,38 @@ export default function CampaignPilotPage() {
                     </div>
 
                     {/* Status & Quick Action Buttons */}
-                    <div className="flex flex-wrap items-center gap-3 shrink-0">
+                    <div className="flex flex-wrap items-center gap-2.5 shrink-0">
                       {/* Approval Status Chip */}
                       <span
-                        className={`px-2.5 py-1 rounded-md text-xs font-mono font-bold flex items-center gap-1.5 ${
+                        className={`px-2.5 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 border ${
                           isDelivered
-                            ? "bg-emerald-950/90 text-emerald-300 border border-emerald-800"
+                            ? "bg-emerald-500/10 text-emerald-300 border-emerald-500/20"
                             : isApproved
-                            ? "bg-blue-950/90 text-blue-300 border border-blue-800"
-                            : "bg-amber-950/90 text-amber-300 border border-amber-800"
+                            ? "bg-indigo-500/10 text-indigo-300 border-indigo-500/20"
+                            : "bg-amber-500/10 text-amber-300 border-amber-500/20"
                         }`}
                       >
                         {isDelivered ? (
                           <>
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            {receipt.status}
+                            <span>{receipt.status}</span>
                           </>
                         ) : isApproved ? (
                           <>
                             <CheckCircle2 className="w-3.5 h-3.5" />
-                            APPROVED
+                            <span>Approved</span>
                           </>
                         ) : (
                           <>
                             <AlertTriangle className="w-3.5 h-3.5" />
-                            READY FOR REVIEW
+                            <span>Awaiting Review</span>
                           </>
                         )}
                       </span>
 
                       {/* Quality Score Badge */}
                       {msg && (
-                        <span className="px-2.5 py-1 rounded-md text-xs font-mono bg-purple-950/60 border border-purple-800/40 text-purple-300">
+                        <span className="px-2.5 py-1 rounded-full text-xs bg-white/[0.04] border border-white/[0.08] text-slate-300">
                           Quality: {msg.qualityScore}/100
                         </span>
                       )}
@@ -587,7 +586,7 @@ export default function CampaignPilotPage() {
                       {/* Expand / Collapse Button */}
                       <button
                         onClick={() => setExpandedLeadId(isExpanded ? null : lead.companyId)}
-                        className="px-3 py-1.5 rounded-lg bg-card border border-border hover:bg-slate-800 text-xs font-medium text-slate-300 flex items-center gap-1.5 transition-colors"
+                        className="px-3.5 py-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.08] text-xs font-medium text-slate-300 flex items-center gap-1.5 transition-all"
                       >
                         <span>{isExpanded ? "Hide Details" : "Review Message"}</span>
                         {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -597,11 +596,11 @@ export default function CampaignPilotPage() {
 
                   {/* Expanded Review & Dispatch Section */}
                   {isExpanded && (
-                    <div className="border-t border-border/80 bg-[#08090f]/90 p-5 space-y-5">
+                    <div className="border-t border-white/[0.04] bg-black/20 p-5 space-y-5">
                       {/* Evidence & Diagnosis Breakdown */}
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-                        <div className="p-3 rounded-lg bg-[#0e101a] border border-border/70 space-y-1">
-                          <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">
+                        <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1">
+                          <span className="text-[10px] uppercase text-slate-500 font-medium">
                             Research Evidence
                           </span>
                           <p className="text-slate-200">
@@ -611,18 +610,18 @@ export default function CampaignPilotPage() {
                           </p>
                         </div>
 
-                        <div className="p-3 rounded-lg bg-[#0e101a] border border-border/70 space-y-1">
-                          <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">
+                        <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1">
+                          <span className="text-[10px] uppercase text-slate-500 font-medium">
                             Diagnosed Reason
                           </span>
                           <p className="text-slate-200 font-mono">{lead.reasonCode}</p>
                         </div>
 
-                        <div className="p-3 rounded-lg bg-[#0e101a] border border-border/70 space-y-1">
-                          <span className="text-[10px] font-mono uppercase text-slate-400 tracking-wider">
+                        <div className="p-3.5 rounded-xl bg-white/[0.02] border border-white/[0.06] space-y-1">
+                          <span className="text-[10px] uppercase text-slate-500 font-medium">
                             Verified Recipient
                           </span>
-                          <p className="text-slate-200 font-mono font-medium">{lead.recipientEmail}</p>
+                          <p className="text-slate-200 font-mono">{lead.recipientEmail}</p>
                           <p className="text-[11px] text-slate-400">
                             {lead.contactName ? `Contact: ${lead.contactName}` : "Company General Inbox"}
                           </p>
@@ -632,30 +631,30 @@ export default function CampaignPilotPage() {
                       {/* Email Preview Box */}
                       {msg ? (
                         <div className="space-y-2">
-                          <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-                            <span>EMAIL COPY PREVIEW</span>
+                          <div className="flex items-center justify-between text-xs text-slate-400">
+                            <span className="font-medium text-slate-300">Email Copy Preview</span>
                             <button
                               onClick={() => copyToClipboard(`${msg.emailSubject}\n\n${msg.emailBody}`, msg.id)}
-                              className="flex items-center gap-1 text-slate-300 hover:text-white transition-colors"
+                              className="flex items-center gap-1 text-slate-400 hover:text-white transition-colors px-2 py-0.5 rounded-lg hover:bg-white/[0.05]"
                             >
                               {copiedId === msg.id ? (
                                 <>
                                   <Check className="w-3.5 h-3.5 text-emerald-400" />
-                                  <span className="text-emerald-400">Copied</span>
+                                  <span className="text-emerald-400 text-xs">Copied</span>
                                 </>
                               ) : (
                                 <>
                                   <Copy className="w-3.5 h-3.5" />
-                                  <span>Copy Draft</span>
+                                  <span className="text-xs">Copy Draft</span>
                                 </>
                               )}
                             </button>
                           </div>
 
-                          <div className="p-4 rounded-xl bg-[#090b12] border border-border/80 space-y-3 font-mono text-xs text-slate-200">
-                            <div className="border-b border-border/50 pb-2">
-                              <span className="text-slate-400">Subject: </span>
-                              <strong className="text-white">{msg.emailSubject}</strong>
+                          <div className="p-4 rounded-xl bg-black/30 border border-white/[0.05] space-y-2.5 text-xs text-slate-200">
+                            <div className="border-b border-white/[0.04] pb-2">
+                              <span className="text-slate-500 font-medium">Subject: </span>
+                              <strong className="text-slate-200">{msg.emailSubject}</strong>
                             </div>
                             <div className="whitespace-pre-wrap leading-relaxed text-slate-300">
                               {msg.emailBody}
@@ -663,24 +662,24 @@ export default function CampaignPilotPage() {
                           </div>
                         </div>
                       ) : (
-                        <div className="p-4 rounded-xl bg-slate-900 border border-slate-800 text-xs text-slate-400">
+                        <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.06] text-xs text-slate-400">
                           No draft generated yet. Generate message from lead detail page first.
                         </div>
                       )}
 
                       {/* Delivery Receipt (if already dispatched) */}
                       {receipt && (
-                        <div className="p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/60 space-y-2 text-xs font-mono">
-                          <div className="flex items-center justify-between text-emerald-400 font-bold">
+                        <div className="p-4 rounded-xl bg-emerald-500/[0.04] border border-emerald-500/20 space-y-2 text-xs">
+                          <div className="flex items-center justify-between text-emerald-400 font-semibold">
                             <span className="flex items-center gap-1.5">
                               <CheckCircle2 className="w-4 h-4" />
-                              DELIVERY RECEIPT: {receipt.status}
+                              Delivery Receipt: {receipt.status}
                             </span>
-                            <span className="text-[11px] text-slate-400">
+                            <span className="text-[11px] text-slate-400 font-normal">
                               Provider: {receipt.provider || "RESEND"}
                             </span>
                           </div>
-                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300 text-[11px]">
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-slate-300 text-[11px] font-mono">
                             <div>Delivery ID: {receipt.id || receipt.deliveryId}</div>
                             <div>Idempotency Key: {receipt.idempotencyKey?.slice(0, 24)}...</div>
                             <div>Timestamp: {receipt.sentAt || receipt.timestamp || new Date().toISOString()}</div>
@@ -690,7 +689,7 @@ export default function CampaignPilotPage() {
                       )}
 
                       {/* Delivery Action Bar */}
-                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-border/60">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-3 border-t border-white/[0.04]">
                         {/* Approval & Confirmation Checkbox */}
                         {!isDelivered && (
                           <div className="flex items-center space-x-3">
@@ -698,10 +697,10 @@ export default function CampaignPilotPage() {
                               <button
                                 onClick={() => handleApprove(msg.id)}
                                 disabled={approvingId === msg.id}
-                                className="px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center gap-2 transition-colors disabled:opacity-50"
+                                className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium flex items-center gap-2 transition-all shadow-md shadow-emerald-600/20 disabled:opacity-50 active:scale-95"
                               >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
-                                {approvingId === msg.id ? "Approving..." : "Approve Message"}
+                                <span>{approvingId === msg.id ? "Approving..." : "Approve Message"}</span>
                               </button>
                             ) : (
                               <label className="flex items-center space-x-2.5 cursor-pointer text-xs select-none">
@@ -709,9 +708,9 @@ export default function CampaignPilotPage() {
                                   type="checkbox"
                                   checked={isConfirmed}
                                   onChange={() => handleToggleConfirm(msg.id)}
-                                  className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-blue-600 focus:ring-blue-500"
+                                  className="w-4 h-4 rounded border-slate-700 bg-slate-900 text-indigo-600 focus:ring-indigo-500"
                                 />
-                                <span className="text-slate-200 font-medium">
+                                <span className="text-slate-300 font-medium">
                                   I have reviewed this recipient, evidence, and message.
                                 </span>
                               </label>
@@ -728,10 +727,10 @@ export default function CampaignPilotPage() {
                               dispatchingId === msg?.id ||
                               metrics.pilotRecipientsUsed >= metrics.pilotRecipientsMax
                             }
-                            className={`px-5 py-2.5 rounded-lg text-xs font-bold flex items-center gap-2 transition-all ${
+                            className={`px-5 py-2.5 rounded-xl text-xs font-medium flex items-center gap-2 transition-all active:scale-95 ${
                               isConfirmed && metrics.pilotRecipientsUsed < metrics.pilotRecipientsMax
-                                ? "bg-gradient-to-r from-blue-600 to-emerald-600 hover:from-blue-500 hover:to-emerald-500 text-white shadow-lg shadow-emerald-950/40"
-                                : "bg-slate-800 text-slate-500 cursor-not-allowed"
+                                ? "bg-gradient-to-r from-indigo-600 to-emerald-600 hover:from-indigo-500 hover:to-emerald-500 text-white shadow-md shadow-indigo-600/20"
+                                : "bg-white/[0.04] text-slate-500 border border-white/[0.06] cursor-not-allowed"
                             }`}
                           >
                             <Send className={`w-3.5 h-3.5 ${dispatchingId === msg?.id ? "animate-spin" : ""}`} />
@@ -755,11 +754,11 @@ export default function CampaignPilotPage() {
       </div>
 
       {/* Safety Notice Footer */}
-      <div className="p-4 rounded-xl bg-[#0a0c14] border border-border/80 flex items-start space-x-3 text-xs text-slate-400">
-        <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+      <div className="glass-panel p-4 rounded-2xl border border-white/[0.06] flex items-start space-x-3 text-xs text-slate-400">
+        <Info className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <span className="font-semibold text-slate-300">Safety Rule & Reply Governance:</span>
-          <p>
+          <span className="font-medium text-slate-200">Safety Rule & Reply Governance:</span>
+          <p className="leading-relaxed">
             Incoming replies will be logged and classified by the intelligence engine, but will <strong>NEVER</strong> automatically trigger an automated follow-up. Every subsequent message requires manual review and approval.
           </p>
         </div>

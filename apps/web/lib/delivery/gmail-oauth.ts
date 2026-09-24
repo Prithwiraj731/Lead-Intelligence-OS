@@ -107,9 +107,10 @@ export function getGmailOAuthConfig() {
   };
 }
 
-export function getGmailAuthorizationUrl(redirectUriOverride?: string): string {
+export function getGmailAuthorizationUrl(redirectUriOverride?: string, returnTo?: string): string {
   const config = getGmailOAuthConfig();
-  const redirectUri = redirectUriOverride || config.redirectUri;
+  const rawUri = redirectUriOverride || config.redirectUri;
+  const redirectUri = rawUri.split("?")[0];
 
   const rootUrl = "https://accounts.google.com/o/oauth2/v2/auth";
   const options = {
@@ -121,9 +122,8 @@ export function getGmailAuthorizationUrl(redirectUriOverride?: string): string {
     scope: [
       "https://www.googleapis.com/auth/gmail.send",
       "https://www.googleapis.com/auth/userinfo.email",
-      "openid",
     ].join(" "),
-    state: Buffer.from(JSON.stringify({ timestamp: Date.now() })).toString("base64url"),
+    state: Buffer.from(JSON.stringify({ timestamp: Date.now(), returnTo: returnTo || "/pilot" })).toString("base64url"),
   };
 
   const qs = new URLSearchParams(options);
@@ -135,7 +135,8 @@ export async function exchangeCodeForTokens(
   redirectUriOverride?: string
 ): Promise<{ email: string; connected: boolean }> {
   const config = getGmailOAuthConfig();
-  const redirectUri = redirectUriOverride || config.redirectUri;
+  const rawUri = redirectUriOverride || config.redirectUri;
+  const redirectUri = rawUri.split("?")[0];
 
   // In test or sandbox environment without live Google credentials, handle gracefully
   if (!config.clientId || !config.clientSecret) {

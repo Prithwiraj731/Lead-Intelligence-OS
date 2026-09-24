@@ -46,13 +46,15 @@ db.run(
         if (err3) console.error('Insert published version failed:', err3);
         else console.log('workflow_published_version updated to:', newVersionId);
 
+        const webhookNode = wfJson.nodes.find(n => n.type === 'n8n-nodes-base.webhook') || { name: '🛰️ SAT-COMM: Inbound Telemetry Ingest' };
+        const webhookNodeName = webhookNode.name;
         const insertWebhook = `INSERT OR REPLACE INTO webhook_entity 
           (workflowId, webhookPath, method, node, webhookId) 
           VALUES (?, ?, ?, ?, ?)`;
 
-        db.run(insertWebhook, [wfJson.id, 'lead-research', 'POST', 'Webhook: Inbound Lead Trigger', 'lead-research-trigger'], (err4) => {
+        db.run(insertWebhook, [wfJson.id, 'lead-research', 'POST', webhookNodeName, 'lead-research-trigger'], (err4) => {
           if (err4) console.error('Insert webhook failed:', err4);
-          else console.log('webhook_entity updated successfully.');
+          else console.log('webhook_entity updated successfully for node:', webhookNodeName);
           
           db.close();
         });

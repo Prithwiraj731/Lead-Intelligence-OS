@@ -4,7 +4,8 @@ import { getGmailAuthorizationUrl } from "@/lib/delivery/gmail-oauth";
 export async function GET(req: NextRequest) {
   try {
     const redirectUri = req.nextUrl.searchParams.get("redirectUri") || undefined;
-    const authUrl = getGmailAuthorizationUrl(redirectUri);
+    const returnTo = req.nextUrl.searchParams.get("returnTo") || undefined;
+    const authUrl = getGmailAuthorizationUrl(redirectUri, returnTo);
 
     return NextResponse.json({
       success: true,
